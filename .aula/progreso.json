@@ -15,10 +15,10 @@
     "S0": {
       "estado": "en curso",
       "pistas": 0,
-      "intentos": 1,
+      "intentos": 3,
       "predicciones": {
         "aciertos": 1,
-        "total": 1
+        "total": 3
       },
       "desbloqueada": false,
       "sellada": null
