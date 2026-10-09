@@ -105,6 +105,7 @@ class LineaMatricula:
     admitida: bool
     en_espera: bool = False
     motivo_rechazo: Optional[str] = None
+    motivo_espera: Optional[str] = None
 
 
 @dataclass
