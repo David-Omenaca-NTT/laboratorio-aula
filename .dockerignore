@@ -1,0 +1,15 @@
+.git/
+.github/
+.devcontainer/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.env
+.env.*
+tests/
+labs/
+specs/
+evals/
