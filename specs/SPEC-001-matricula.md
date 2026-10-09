@@ -64,3 +64,4 @@ Rutas: src/aula/reglas/motor.py, src/aula/dominio/, tests/test_reglas_matricula.
 |---|-----------|------------|-------|
 | A-01 | El enunciado original decía "se rechazan las asignaturas que superen el límite" sin fijar orden. Con orden indeterminado el resultado no es reproducible | Se admiten en el orden en que aparecen en la solicitud. Recogido en CA-03 | 2026-08 |
 | A-02 | No estaba definido si una convalidación consume convocatoria | No la consume. Recogido en CA-04 | 2026-08 |
+| A-03 | La API no tenía configurada la ventana de matrícula exigida por la spec | El servicio exige `MATRICULA_INICIO` y `MATRICULA_FIN` en formato ISO-8601. Si falta alguna o no es válida, el POST responde `503` en lugar de evaluar con una ventana inventada | 2026-10 |
