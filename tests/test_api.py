@@ -11,11 +11,11 @@ client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def preparar_aplicacion(monkeypatch, tmp_path):
-    app.state.matriculas.clear()
-    app.state.expedientes.clear()
     monkeypatch.setenv("MATRICULA_INICIO", "2020-01-01T00:00:00Z")
     monkeypatch.setenv("MATRICULA_FIN", "2030-01-01T00:00:00Z")
     monkeypatch.setattr(auditoria, "RUTA_TRAZA", tmp_path / "auditoria.jsonl")
+    with client:
+        yield
 
 
 def matricula_valida():
@@ -59,6 +59,8 @@ def test_salud_devuelve_json():
 
 def test_matricula_valida_devuelve_201_y_se_guarda_en_memoria():
     """cubre: SPEC-001/INV-01; crea y conserva el resultado evaluado."""
+    assert app.state.matriculas == []
+    assert app.state.expedientes == {}
     response = client.post("/matriculas", json=matricula_valida())
     assert response.status_code == 201
     assert response.json()["estado"] == "validada"
