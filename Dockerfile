@@ -15,20 +15,29 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --disable-pip-version-check \
     -r requirements-prod.txt
 
+RUN rm -rf /opt/venv/lib/python3.12/site-packages/pip \
+           /opt/venv/lib/python3.12/site-packages/pip-*.dist-info \
+    && find /opt/venv -type d -name '__pycache__' -prune -exec rm -rf {} +
 
 FROM python:3.12-slim AS runtime
 
 ENV PATH="/opt/venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/aula
+    PYTHONPATH=/aula \
+    AULA_TRAZA=/aula/.aula/auditoria.jsonl
 
 WORKDIR /aula
+
+LABEL org.opencontainers.image.source="https://github.com/David-Omenaca-NTT/laboratorio-aula"
 
 RUN useradd --create-home --uid 10001 appuser
 
 COPY --from=dependencies /opt/venv /opt/venv
 COPY --chown=10001:10001 src/ ./src/
+COPY --chown=10001:10001 datos/planes/ ./datos/planes/
+
+RUN install -d -o 10001 -g 10001 /aula/.aula
 
 USER 10001:10001
 
