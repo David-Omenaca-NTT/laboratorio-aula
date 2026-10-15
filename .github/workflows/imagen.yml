@@ -1,0 +1,87 @@
+name: imagen
+
+on:
+  workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  construir-y-probar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir imagen de producción
+        run: docker build --tag aula:ci .
+
+      - name: Probar endpoints de la imagen
+        run: |
+          set -Eeuo pipefail
+          docker run --detach --name aula-ci \
+            --publish 127.0.0.1:18000:8000 \
+            --env MATRICULA_INICIO=2000-01-01T00:00:00Z \
+            --env MATRICULA_FIN=2100-01-01T00:00:00Z \
+            aula:ci
+          trap 'docker rm --force aula-ci >/dev/null 2>&1 || true' EXIT
+
+          for intento in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18000/salud; then
+              break
+            fi
+            if [ "$intento" -eq 30 ]; then
+              echo "La imagen no respondió en /salud."
+              docker logs aula-ci
+              exit 1
+            fi
+            sleep 1
+          done
+
+          respuesta=$(curl --fail --silent --show-error \
+            --header 'Content-Type: application/json' \
+            --request POST \
+            --data '{"estudiante_id":"EST-CI","curso_academico":"2099-2100","codigos":["MAT101"]}' \
+            http://127.0.0.1:18000/matriculas)
+
+          printf '%s' "$respuesta" | python -c '
+          import json
+          import sys
+
+          matricula = json.load(sys.stdin)
+          assert matricula["estudiante_id"] == "EST-CI"
+          assert matricula["lineas"][0]["codigo_asignatura"] == "MAT101"
+          assert matricula["lineas"][0]["admitida"] is True
+          '
+
+      - name: Iniciar sesión en GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publicar imagen privada en GHCR
+        if: github.event_name == 'push'
+        env:
+          REPOSITORIO: ${{ github.repository }}
+          REFERENCIA: ${{ github.ref }}
+          ETIQUETA_REFERENCIA: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -Eeuo pipefail
+          imagen="ghcr.io/$(printf '%s' "$REPOSITORIO" | tr '[:upper:]' '[:lower:]')"
+          docker tag aula:ci "$imagen:sha-$SHA"
+          docker push "$imagen:sha-$SHA"
+
+          if [ "$REFERENCIA" = "refs/heads/main" ]; then
+            docker tag aula:ci "$imagen:latest"
+            docker push "$imagen:latest"
+          elif [[ "$REFERENCIA" == refs/tags/v* ]]; then
+            docker tag aula:ci "$imagen:$ETIQUETA_REFERENCIA"
+            docker push "$imagen:$ETIQUETA_REFERENCIA"
+          fi

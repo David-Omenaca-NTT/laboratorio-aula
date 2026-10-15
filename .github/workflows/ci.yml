@@ -59,10 +59,23 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
 
       - name: Instalar dependencias
         run: python -m pip install -r requirements.txt
 
-      - name: Ejecutar suite de tests
-        run: python -m pytest tests/ -q        
+      - name: Ejecutar tests y exigir cobertura de dominio superior al 60 %
+        run: >-
+          python -m pytest tests/ -q
+          --cov=src/aula/dominio
+          --cov-report=term-missing
+          --cov-fail-under=61
+
+  build-imagen:
+    name: Construir y probar imagen
+    needs: tests
+    permissions:
+      contents: read
+    uses: ./.github/workflows/imagen.yml
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

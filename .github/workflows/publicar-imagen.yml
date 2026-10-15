@@ -1,0 +1,42 @@
+name: publicar-imagen
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements.txt
+
+      - name: Ejecutar tests y exigir cobertura de dominio superior al 60 %
+        run: >-
+          python -m pytest tests/ -q
+          --cov=src/aula/dominio
+          --cov-report=term-missing
+          --cov-fail-under=61
+
+  publicar:
+    name: Construir, probar y publicar imagen
+    needs: tests
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/imagen.yml
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
