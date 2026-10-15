@@ -3,7 +3,7 @@ name: imagen
 on:
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
+      GHCR_TOKEN:
         required: true
 
 jobs:
@@ -60,7 +60,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Publicar imagen privada en GHCR
         if: github.event_name == 'push'

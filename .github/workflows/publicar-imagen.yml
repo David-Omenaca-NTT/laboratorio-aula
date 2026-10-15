@@ -39,4 +39,4 @@ jobs:
       packages: write
     uses: ./.github/workflows/imagen.yml
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
