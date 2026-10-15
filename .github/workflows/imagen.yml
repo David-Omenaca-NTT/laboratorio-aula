@@ -6,9 +6,6 @@ on:
       GITHUB_TOKEN:
         required: true
 
-permissions:
-  contents: read
-
 jobs:
   construir-y-probar:
     runs-on: ubuntu-latest
