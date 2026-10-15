@@ -26,6 +26,11 @@ Esta guia dice que conseguir, no como. Si pudieras seguirla sin pensar, no
 aprenderias nada que sirva cuando cambie el contexto, que es lo que pasa en
 cliente el primer dia.
 
+La publicación en un registry forma parte del entregable, aunque el verificador
+local no la compruebe. Para el estado actual, los pasos recomendados para
+construir, probar y publicar la imagen están en
+[ARRANQUE.md](../../ARRANQUE.md#pasos-para-publicar-una-imagen-persistente).
+
 ## Entregable
 
 Pipeline verde de extremo a extremo, imagen publicada, cobertura del modulo de dominio por encima del 60%.
