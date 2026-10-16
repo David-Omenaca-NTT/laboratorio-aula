@@ -12,6 +12,11 @@ el mentor debe validar tambien la evidencia y los controles externos.
 
 Pipeline verde de extremo a extremo, imagen publicada, cobertura del modulo de dominio por encima del 60%.
 
+El verificador local no consulta un registry: que `aula check S1` esté en verde
+no demuestra por sí solo que la imagen esté publicada. Para cerrar el entregable,
+el mentor debe validar el enlace o referencia de la imagen publicada además de
+los criterios automáticos.
+
 ## Pistas disponibles
 
 3 escalones: empujon, direccion y fragmento de solucion.

@@ -1,37 +1,39 @@
-# Manual de arranque de Aula Students
+# Manual de arranque de Aula
 
-Requiere Python 3.11 o posterior. Ejecuta todo desde la raiz de `aula-students`.
-Instala dependencias y activa el entorno como indica [README.md](README.md).
+Ejecuta los comandos desde la raíz del repositorio. Necesitas Python 3.11 o
+posterior.
 
-```bash
-python -m aula_cli estado
-python -m aula_cli guia S0
-python -m aula_cli check S0 --prediccion falla
-```
+## Arranque local
 
-S0 comienza pendiente. Los checks rojos son normales en una semilla.
-
-## Servicio local
-
-Git Bash, Linux y macOS:
+Prepara el entorno e instala las dependencias:
 
 ```bash
-PYTHONPATH=src python -m uvicorn aula.api.app:app --host 127.0.0.1 --port 8001
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
-PowerShell:
-
-```powershell
-$env:PYTHONPATH = "src"
-python -m uvicorn aula.api.app:app --host 127.0.0.1 --port 8001
-```
-
-En otra terminal:
+Configura las fechas ISO-8601 de la ventana de matrícula y levanta la API:
 
 ```bash
-python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8001/salud').read().decode())"
+export MATRICULA_INICIO="2026-09-01T00:00:00Z"
+export MATRICULA_FIN="2027-08-31T23:59:59Z"
+python3 -m uvicorn src.aula.api.main:app --reload
 ```
 
-La documentacion esta en http://127.0.0.1:8001/docs. Los recursos de matriculas
-y expedientes devuelven 501 hasta que se implementen en S1 y S2.
-Deten el servicio con Ctrl+C. Si el puerto esta ocupado, elige otro.
+Sustituye esas fechas de ejemplo por las del periodo vigente.
+Sin esas variables el servidor arranca, pero `POST /matriculas` responde `503`.
+La API está en <http://127.0.0.1:8000>; comprueba `/salud` o abre `/docs`.
+Detén el servidor con `Ctrl+C`.
+
+## Alternativa: Docker
+
+Desde la raíz, construye la imagen y pasa las fechas al contenedor:
+
+```bash
+docker build -t aula:local .
+docker run --rm -p 8000:8000 \
+  -e MATRICULA_INICIO="2026-09-01T00:00:00Z" \
+  -e MATRICULA_FIN="2027-08-31T23:59:59Z" \
+  aula:local
+```
