@@ -44,8 +44,8 @@ becas, así que la reproducibilidad exacta del número es un requisito, no un de
 | Caso | Resultado esperado |
 |------|--------------------|
 | Expediente vacío | Nota media 0,00, créditos 0, progreso 0,00 |
-| Todas las asignaturas convalidadas | Por acordar antes de implementar |
-| Asignatura aprobada en convocatoria 2 y también en convocatoria 4 | Por acordar antes de implementar |
+| Todas las asignaturas convalidadas sin calificación numérica | Nota media 0,00; sus créditos cuentan como superados |
+| Asignatura aprobada en convocatoria 2 y también en convocatoria 4 | Se computa la calificación del último registro aprobado |
 | Nota con más de dos decimales en origen | Se conserva íntegra en el numerador y solo se redondea el cociente final |
 | Media exactamente en el punto medio, por ejemplo 7,005 | Redondeo half-up a 7,01 |
 
@@ -62,3 +62,5 @@ Rutas: src/aula/reglas/media.py, tests/test_media_expediente.py, specs/SPEC-002-
 
 | # | Ambigüedad | Resolución adoptada | Alternativas descartadas y por qué |
 |---|-----------|---------------------|-------------------------------------|
+| A-01 | CA-02 no determina qué calificación debe utilizarse para calcular la nota media cuando una asignatura tiene varias convocatorias y más de un registro aprobado. La referencia genérica a la "normativa académica vigente" no permite obtener un resultado determinista sin concretar dicha regla. | Para cada asignatura se computará una única calificación: la correspondiente al último registro aprobado, determinado por curso académico y convocatoria. Los intentos suspensos o no presentados permanecen en el expediente y consumen convocatoria cuando corresponda, pero no participan en la nota media. Los créditos de la asignatura se ponderan una sola vez. | Se descarta utilizar la primera nota aprobada porque ignoraría una superación posterior; utilizar la mejor nota porque introduciría una política favorable no establecida en la especificación; y computar todas las convocatorias porque supondría ponderar varias veces los créditos de una misma asignatura. Como referencia se ha consultado el tratamiento académico de la Universidad de Zaragoza. |
+| A-02 | CA-03 indica que una asignatura convalidada recibirá "el tratamiento previsto para las convalidaciones", pero no especifica si participa en la nota media ni cómo actuar cuando existe o no una calificación numérica asociada. | Se adopta un tratamiento inspirado en la normativa de reconocimiento de créditos de la Universidad de Zaragoza: una asignatura convalidada con calificación numérica participa en la nota media utilizando dicha calificación. Si carece de calificación numérica, no participa ni en el numerador ni en el denominador de la nota media. En ambos casos sus créditos cuentan como superados. | Se descarta excluir siempre las convalidaciones de la nota media porque impediría incorporar aquellas que disponen de calificación de origen; y se descarta obligar a que toda convalidación tenga nota porque el modelo admite registros sin calificación y existen reconocimientos sin calificación numérica. |

@@ -3,6 +3,8 @@ from dataclasses import replace
 import pytest
 
 from aula import auditoria
+from aula.dominio.estados import PlanInmutable, transicionar
+from aula.dominio.modelos import EstadoMatricula, Matricula
 from aula.reglas.motor import (Grupo, VentanaCerrada, VentanaMatricula,
                                creditos_superados, evaluar_solicitud,
                                ordenar_por_prioridad)
@@ -16,6 +18,16 @@ def traza(monkeypatch, tmp_path):
 
 def ventana():
     return VentanaMatricula("2026-09-01T00:00:00Z", "2026-09-30T23:59:59Z")
+
+
+def matricula(estado=EstadoMatricula.SOLICITADA):
+    return Matricula(
+        estudiante_id="EST-0001",
+        curso_academico="2026-2027",
+        plan_aplicado="PLAN-2024",
+        version_plan_aplicada="1",
+        estado=estado,
+    )
 
 
 def test_ventana_inclusiva_y_rechazo_auditado():
@@ -36,6 +48,101 @@ def test_prerrequisito_y_asignatura_superada():
     m = evaluar_solicitud(solicitud(["MAT101"]), expediente(registro("MAT101", "aprobada")),
                           p, v, {})
     assert m.lineas[0].motivo_rechazo == "asignatura ya superada"
+
+
+def test_cada_codigo_solicitado_produce_una_linea_incluso_repetidos():
+    """cubre: SPEC-001/INV-02"""
+    codigos = ["MAT101", "PRG101", "MAT101"]
+    m = evaluar_solicitud(
+        solicitud(codigos), expediente(), plan(), ventana(), {},
+    )
+
+    assert len(m.lineas) == len(codigos)
+    assert [linea.codigo_asignatura for linea in m.lineas] == codigos
+
+
+def test_inv03_permite_cambiar_plan_y_version_antes_de_confirmar():
+    """cubre: SPEC-001/INV-03"""
+    m = matricula()
+
+    m.plan_aplicado = "PLAN-2025"
+    m.version_plan_aplicada = "2"
+
+    assert (m.plan_aplicado, m.version_plan_aplicada) == ("PLAN-2025", "2")
+
+
+def test_inv03_transicion_rechaza_cambio_de_plan_tras_confirmar():
+    """cubre: SPEC-001/INV-03"""
+    m = matricula()
+    transicionar(m, EstadoMatricula.VALIDADA)
+    transicionar(m, EstadoMatricula.CONFIRMADA)
+
+    with pytest.raises(PlanInmutable):
+        transicionar(m, EstadoMatricula.EN_CURSO, nuevo_plan="PLAN-2025")
+
+    assert (m.plan_aplicado, m.version_plan_aplicada) == ("PLAN-2024", "1")
+
+
+def test_inv03_asignacion_directa_no_cambia_plan_ni_version_confirmados():
+    """cubre: SPEC-001/INV-03"""
+    m = matricula()
+    transicionar(m, EstadoMatricula.VALIDADA)
+    transicionar(m, EstadoMatricula.CONFIRMADA)
+
+    with pytest.raises(PlanInmutable):
+        m.plan_aplicado = "PLAN-2025"
+    with pytest.raises(PlanInmutable):
+        m.version_plan_aplicada = "2"
+
+    assert (m.plan_aplicado, m.version_plan_aplicada) == ("PLAN-2024", "1")
+
+
+def test_inv03_anular_no_desbloquea_plan_confirmado():
+    """cubre: SPEC-001/INV-03"""
+    m = matricula()
+    transicionar(m, EstadoMatricula.VALIDADA)
+    transicionar(m, EstadoMatricula.CONFIRMADA)
+    transicionar(m, EstadoMatricula.ANULADA)
+
+    with pytest.raises(PlanInmutable):
+        m.plan_aplicado = "PLAN-2025"
+    with pytest.raises(PlanInmutable):
+        m.version_plan_aplicada = "2"
+
+    assert (m.plan_aplicado, m.version_plan_aplicada) == ("PLAN-2024", "1")
+
+
+@pytest.mark.parametrize(
+    "estado",
+    [
+        EstadoMatricula.CONFIRMADA,
+        EstadoMatricula.EN_CURSO,
+        EstadoMatricula.CALIFICADA,
+        EstadoMatricula.CERRADA,
+    ],
+)
+def test_inv03_protege_matricula_creada_en_estado_confirmado_o_posterior(estado):
+    """cubre: SPEC-001/INV-03"""
+    m = matricula(estado)
+
+    with pytest.raises(PlanInmutable):
+        m.plan_aplicado = "PLAN-2025"
+    with pytest.raises(PlanInmutable):
+        m.version_plan_aplicada = "2"
+
+    assert (m.plan_aplicado, m.version_plan_aplicada) == ("PLAN-2024", "1")
+
+
+def test_inv03_no_se_puede_desactivar_la_confirmacion_previa():
+    """cubre: SPEC-001/INV-03"""
+    m = matricula()
+    transicionar(m, EstadoMatricula.VALIDADA)
+    transicionar(m, EstadoMatricula.CONFIRMADA)
+
+    assert m.confirmada_alguna_vez is True
+    with pytest.raises(PlanInmutable):
+        m.confirmada_alguna_vez = False
+    assert m.confirmada_alguna_vez is True
 
 
 def test_limites_creditos_y_grupo_completo():

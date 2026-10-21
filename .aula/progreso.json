@@ -2,26 +2,37 @@
   "student": "sin-asignar",
   "estaciones": {
     "S1": {
-      "estado": "en curso",
+      "estado": "sellada",
       "pistas": 0,
-      "intentos": 0,
+      "intentos": 1,
       "predicciones": {
         "aciertos": 0,
         "total": 0
       },
       "desbloqueada": false,
-      "sellada": null
+      "sellada": "2026-10-15T15:42:38+00:00"
     },
     "S0": {
-      "estado": "en curso",
+      "estado": "sellada",
       "pistas": 0,
-      "intentos": 3,
+      "intentos": 5,
       "predicciones": {
         "aciertos": 1,
         "total": 3
       },
       "desbloqueada": false,
-      "sellada": null
+      "sellada": "2026-10-15T15:40:42+00:00"
+    },
+    "S2": {
+      "estado": "sellada",
+      "pistas": 0,
+      "intentos": 9,
+      "predicciones": {
+        "aciertos": 1,
+        "total": 1
+      },
+      "desbloqueada": false,
+      "sellada": "2026-10-21T13:39:04+00:00"
     }
   },
   "creado": "2026-10-07T09:43:16+00:00"
