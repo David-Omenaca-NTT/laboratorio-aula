@@ -25,7 +25,7 @@ La decisión debe quedar auditada con la versión de plan aplicada.
 
 - INV-01: toda evaluación de solicitud escribe exactamente una entrada de auditoría con el código y la versión de plan aplicados.
 - INV-02: el número de líneas de la matrícula resultante es igual al número de códigos solicitados. Nunca se pierde ni se duplica una solicitud de asignatura.
-- INV-03: una matrícula en estado confirmada o posterior no puede cambiar de plan de estudios.
+- INV-03: una matrícula puede cambiar de plan y versión antes de su primera confirmación. Desde que alcanza por primera vez el estado `CONFIRMADA`, `plan_aplicado` y `version_plan_aplicada` quedan bloqueados definitivamente, incluso si posteriormente pasa a `ANULADA`.
 
 ## Criterios de aceptación
 
@@ -65,3 +65,4 @@ Rutas: src/aula/reglas/motor.py, src/aula/dominio/, tests/test_reglas_matricula.
 | A-01 | El enunciado original decía "se rechazan las asignaturas que superen el límite" sin fijar orden. Con orden indeterminado el resultado no es reproducible | Se admiten en el orden en que aparecen en la solicitud. Recogido en CA-03 | 2026-08 |
 | A-02 | No estaba definido si una convalidación consume convocatoria | No la consume. Recogido en CA-04 | 2026-08 |
 | A-03 | La API no tenía configurada la ventana de matrícula exigida por la spec | El servicio exige `MATRICULA_INICIO` y `MATRICULA_FIN` en formato ISO-8601. Si falta alguna o no es válida, el POST responde `503` en lugar de evaluar con una ventana inventada | 2026-10 |
+| A-04 | INV-03 hablaba de una matrícula "confirmada o posterior" sin definir los estados posteriores ni el efecto de una anulación | El plan y su versión pueden cambiar antes de la primera confirmación. Al alcanzar `CONFIRMADA`, ambos quedan inmutables para siempre; `EN_CURSO`, `CALIFICADA` y `CERRADA` conservan el bloqueo. `ANULADA` también lo conserva si la matrícula fue confirmada previamente. Una adaptación a otro plan es un procedimiento independiente y no modifica la matrícula original | 2026-10 |
