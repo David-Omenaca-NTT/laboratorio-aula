@@ -74,8 +74,6 @@ def evaluar_solicitud(solicitud: SolicitudMatricula, expediente: Expediente,
                       grupos: dict) -> Matricula:
     if not solicitud.codigos:
         raise ValueError("la solicitud debe incluir al menos un codigo")
-    if len(solicitud.codigos) != len(set(solicitud.codigos)):
-        raise ValueError("la solicitud no puede repetir codigos")
     desconocidos = [codigo for codigo in solicitud.codigos
                     if codigo not in plan.asignaturas]
     if desconocidos:

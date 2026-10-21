@@ -28,6 +28,18 @@ class EstadoMatricula(str, Enum):
     ANULADA = "anulada"
 
 
+class PlanInmutable(Exception):
+    pass
+
+
+_ESTADOS_CONFIRMADOS = {
+    EstadoMatricula.CONFIRMADA,
+    EstadoMatricula.EN_CURSO,
+    EstadoMatricula.CALIFICADA,
+    EstadoMatricula.CERRADA,
+}
+
+
 @dataclass(frozen=True)
 class Asignatura:
     codigo: str
@@ -85,9 +97,19 @@ class Expediente:
         return any(r.estado is EstadoRegistro.CONVALIDADA
                    for r in self.registros_de(codigo))
 
-    def ultimo_intento_aprobado(self, codigo: str):
-        """S2: completar este helper si la normativa acordada lo requiere."""
-        raise NotImplementedError("S2: seleccionar registro tras resolver SPEC-002")
+    def ultimo_intento_aprobado(self, codigo: str) -> Optional[RegistroAcademico]:
+        """Devuelve la última aprobación según curso académico y convocatoria."""
+        aprobados = [
+            registro
+            for registro in self.registros_de(codigo)
+            if registro.estado is EstadoRegistro.APROBADA
+        ]
+        if not aprobados:
+            return None
+        return max(
+            aprobados,
+            key=lambda registro: (registro.curso_academico, registro.convocatoria),
+        )
 
 
 @dataclass
@@ -116,6 +138,44 @@ class Matricula:
     version_plan_aplicada: str
     estado: EstadoMatricula
     lineas: list = field(default_factory=list)
+    confirmada_alguna_vez: bool = field(default=False, init=False)
+
+    def __post_init__(self):
+        object.__setattr__(
+            self,
+            "confirmada_alguna_vez",
+            self.estado in _ESTADOS_CONFIRMADOS,
+        )
+
+    def __setattr__(self, nombre, valor):
+        if nombre in ("plan_aplicado", "version_plan_aplicada"):
+            actual = getattr(self, nombre, valor)
+            if getattr(self, "confirmada_alguna_vez", False) and valor != actual:
+                raise PlanInmutable(
+                    "el plan y su version no pueden cambiar tras confirmar la matricula"
+                )
+        elif nombre == "confirmada_alguna_vez":
+            actual = getattr(self, nombre, False)
+            if valor != actual:
+                raise PlanInmutable(
+                    "la confirmacion previa solo puede cambiar internamente"
+                )
+        elif nombre == "estado" and valor in _ESTADOS_CONFIRMADOS:
+            object.__setattr__(self, "confirmada_alguna_vez", True)
+
+        object.__setattr__(self, nombre, valor)
+
+    def __delattr__(self, nombre):
+        if nombre in ("plan_aplicado", "version_plan_aplicada"):
+            if self.confirmada_alguna_vez:
+                raise PlanInmutable(
+                    "el plan y su version no pueden cambiar tras confirmar la matricula"
+                )
+        elif nombre == "confirmada_alguna_vez":
+            raise PlanInmutable(
+                "no se puede eliminar la confirmacion previa de la matricula"
+            )
+        object.__delattr__(self, nombre)
 
     @property
     def creditos_admitidos(self) -> int:
