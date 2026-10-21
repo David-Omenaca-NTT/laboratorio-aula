@@ -4,6 +4,7 @@ Registro provisional reconstruido del historial Git. Las horas son estimaciones
 de actividad, no mediciones; los commits marcan hitos y no prueban tiempo
 efectivo. Horario local asumido: Europe/Madrid (CEST, UTC+2 en estas fechas).
 Revisa y corrige las duraciones con quien hizo el trabajo.
+Hay que tener en cuenta que parte estaba reutilizada de un repo anterior de s1.
 
 Importante: el historial incluye trabajo asistido por agentes. Por tanto, estas
 entradas documentan el trabajo realizado, pero no constituyen una linea base
