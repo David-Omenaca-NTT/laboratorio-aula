@@ -9,6 +9,10 @@ on:
 jobs:
   construir-y-probar:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -82,3 +86,22 @@ jobs:
             docker tag aula:ci "$imagen:$ETIQUETA_REFERENCIA"
             docker push "$imagen:$ETIQUETA_REFERENCIA"
           fi
+
+      - name: Instalar Cosign
+        if: github.event_name == 'push'
+        uses: sigstore/cosign-installer@v3
+
+      - name: Firmar imagen publicada
+        if: github.event_name == 'push'
+        env:
+          REPOSITORIO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -Eeuo pipefail
+          IMAGE="ghcr.io/$(printf '%s' "$REPOSITORIO" | tr '[:upper:]' '[:lower:]')"
+          DIGEST="$(docker buildx imagetools inspect "${IMAGE}:sha-${SHA}" --format '{{.Manifest.Digest}}')"
+          if [[ ! "$DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "El digest publicado no tiene el formato SHA-256 esperado: $DIGEST" >&2
+            exit 1
+          fi
+          cosign sign --yes "${IMAGE}@${DIGEST}"
