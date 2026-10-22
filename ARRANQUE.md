@@ -110,16 +110,23 @@ devuelve `422`. `AULA_TRAZA` es opcional y cambia la ruta del fichero de
 auditoría, cuyo valor local por defecto es `.aula/auditoria.jsonl`.
 
 La API queda en <http://127.0.0.1:8000>. Comprueba `/salud` o abre la
-documentación interactiva en `/docs`. Para registrar una matrícula, envía un
-`POST` a `/matriculas` con JSON, por ejemplo:
+documentación interactiva en `/docs`. Las variables de entorno se configuran
+en el proceso del servidor, no dentro del JSON. Para registrar una matrícula,
+envía un `POST` a `/matriculas` con los campos de entrada que admite la API:
 
-```json
-{
-  "estudiante_id": "EST001",
-  "curso_academico": "2026-2027",
-  "codigos": ["MAT101"]
-}
+```bash
+curl -X POST "http://127.0.0.1:8000/matriculas" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "estudiante_id": "EST001",
+    "curso_academico": "2026-2027",
+    "codigos": ["MAT101"]
+  }'
 ```
+
+`plan_aplicado`, `version_plan_aplicada`, `estado`, `lineas` y
+`creditos_admitidos` forman parte de la respuesta del POST; no se envían en el
+cuerpo de la solicitud.
 
 En la imagen de producción, pasa las fechas al crear el contenedor; el
 Dockerfile no fija fechas de matrícula:

@@ -33,6 +33,17 @@
       },
       "desbloqueada": false,
       "sellada": "2026-10-21T13:39:04+00:00"
+    },
+    "S3": {
+      "estado": "en curso",
+      "pistas": 0,
+      "intentos": 3,
+      "predicciones": {
+        "aciertos": 0,
+        "total": 0
+      },
+      "desbloqueada": false,
+      "sellada": null
     }
   },
   "creado": "2026-10-07T09:43:16+00:00"
