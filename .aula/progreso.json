@@ -35,9 +35,20 @@
       "sellada": "2026-10-21T13:39:04+00:00"
     },
     "S3": {
+      "estado": "sellada",
+      "pistas": 0,
+      "intentos": 4,
+      "predicciones": {
+        "aciertos": 0,
+        "total": 0
+      },
+      "desbloqueada": false,
+      "sellada": "2026-10-23T07:25:31+00:00"
+    },
+    "S4a": {
       "estado": "en curso",
       "pistas": 0,
-      "intentos": 3,
+      "intentos": 1,
       "predicciones": {
         "aciertos": 0,
         "total": 0

@@ -1,0 +1,57 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m pytest*)",
+      "Bash(python3 -m aula_cli check*)",
+      "Bash(python3 -m agentes.conformidad.evaluar*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)"
+    ],
+    "deny": [
+      "Edit(manifiestos/**)",
+      "Write(manifiestos/**)",
+      "Edit(.github/workflows/**)",
+      "Write(.github/workflows/**)",
+      "Edit(labs/**/verificar.py)",
+      "Write(labs/**/verificar.py)",
+      "Edit(evals/dorado*/**)",
+      "Write(evals/dorado*/**)",
+      "Edit(src/aula/legado/**)",
+      "Write(src/aula/legado/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 herramientas/hook_formato.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 herramientas/hook_rutas.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 herramientas/hook_tests_commit.py"
+          }
+        ]
+      }
+    ]
+  }
+}

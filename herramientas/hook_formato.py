@@ -7,9 +7,17 @@ from pathlib import Path
 def main():
     try:
         entrada = json.load(sys.stdin)
-    except Exception:
-        return 0
-    ruta = (entrada.get("tool_input", {}) or {}).get("file_path", "")
+    except json.JSONDecodeError as error:
+        print("hook_formato: entrada JSON invalida: %s" % error, file=sys.stderr)
+        return 2
+    entrada_herramienta = entrada.get("tool_input")
+    if not isinstance(entrada_herramienta, dict):
+        print("hook_formato: falta tool_input en la entrada", file=sys.stderr)
+        return 2
+    ruta = entrada_herramienta.get("file_path")
+    if not isinstance(ruta, str) or not ruta:
+        print("hook_formato: falta una ruta de archivo valida", file=sys.stderr)
+        return 2
     p = Path(ruta)
     if not p.exists() or p.suffix != ".py":
         return 0
