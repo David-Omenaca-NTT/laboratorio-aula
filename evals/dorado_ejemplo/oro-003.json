@@ -1,0 +1,19 @@
+{
+  "id": "oro-003",
+  "titulo": "Invariante cubierto",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "INV-02"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_dec():\n    \"\"\"cubre: SPEC-002/INV-02\"\"\"\n    assert isinstance(r, Decimal)\n"
+    }
+  ],
+  "etiqueta": "conforme"
+}

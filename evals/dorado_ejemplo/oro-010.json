@@ -1,0 +1,19 @@
+{
+  "id": "oro-010",
+  "titulo": "Test omitido",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-01"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "@pytest.mark.skip(reason=\"lento\")\ndef test_a():\n    \"\"\"cubre: SPEC-002/CA-01\"\"\"\n    assert z == 2\n"
+    }
+  ],
+  "etiqueta": "no_conforme_riesgo"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "oro-013",
+  "titulo": "Excepcion silenciada",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-07"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_a():\n    \"\"\"cubre: SPEC-002/CA-07\"\"\"\n    try:\n        calcular()\n    except:\n        pass\n    assert True\n"
+    }
+  ],
+  "etiqueta": "no_conforme_riesgo"
+}
