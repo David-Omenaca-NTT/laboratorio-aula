@@ -1,0 +1,20 @@
+{
+  "id": "oro-004",
+  "titulo": "Criterio declarado sin test",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-02",
+    "CA-03"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_a():\n    \"\"\"cubre: SPEC-002/CA-02\"\"\"\n    assert m == Decimal(\"6.00\")\n"
+    }
+  ],
+  "etiqueta": "no_conforme_sin_cubrir"
+}

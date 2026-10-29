@@ -1,0 +1,21 @@
+{
+  "id": "oro-006",
+  "titulo": "Tres criterios uno cubierto",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-01",
+    "CA-02",
+    "CA-03"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_a():\n    \"\"\"cubre: SPEC-002/CA-01\"\"\"\n    assert q == 1\n"
+    }
+  ],
+  "etiqueta": "no_conforme_sin_cubrir"
+}

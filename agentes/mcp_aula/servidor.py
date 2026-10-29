@@ -170,8 +170,63 @@ IMPLEMENTACION = {
 # --- transporte JSON-RPC sobre stdio ------------------------------------------
 
 def manejar(mensaje: dict):
-    raise NotImplementedError("S4a: implementar initialize, tools/list y tools/call")
+    metodo = mensaje.get("method")
+    ident = mensaje.get("id")
 
+    if metodo == "tools/list":
+        return _ok(ident, {"tools": HERRAMIENTAS})
+
+    if metodo == "initialize":
+        return _ok(ident, {
+            "protocolVersion": PROTOCOLO,
+            "capabilities": {"tools": {}},
+            "serverInfo": {
+                "name": "aula-contexto",
+                "version": "1.0.0"
+            }
+        })
+
+    if metodo == "tools/call":
+        nombre = mensaje["params"]["name"]
+        args = mensaje["params"].get("arguments", {})
+
+        if nombre not in IMPLEMENTACION:
+            return _error(
+                ident,
+                -32601,
+                "herramienta desconocida: %s" % nombre
+            )
+
+        try:
+            resultado = IMPLEMENTACION[nombre](args)
+        except Exception as exc:
+            return _ok(ident, {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "error: %s" % exc
+                    }
+                ],
+                "isError": True
+            })
+
+        return _ok(ident, {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(
+                        resultado,
+                        ensure_ascii=False,
+                        indent=2
+                    )
+                }
+            ]
+        })
+
+    if metodo == "notifications/initialized":
+        return None
+
+    return _error(ident, -32601, "Método no soportado")
 
 def _ok(ident, resultado):
     return {"jsonrpc": "2.0", "id": ident, "result": resultado}
@@ -182,7 +237,18 @@ def _error(ident, codigo, mensaje):
 
 
 def principal():
-    raise NotImplementedError("S4a: implementar transporte JSON-RPC por stdio")
+    """Bucle principal del servidor MCP."""
+    for linea in sys.stdin:
+        try:
+            mensaje = json.loads(linea)
+        except Exception as exc:
+            sys.stderr.write("error parseando JSON: %s\n" % exc)
+            continue
+
+        respuesta = manejar(mensaje)
+        if respuesta is not None:
+            sys.stdout.write(json.dumps(respuesta, ensure_ascii=False) + "\n")
+            sys.stdout.flush()
 
 
 if __name__ == "__main__":

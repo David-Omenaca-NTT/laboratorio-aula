@@ -1,0 +1,15 @@
+{
+  "id": "oro-005",
+  "titulo": "Ningun test",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-05"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    }
+  ],
+  "etiqueta": "no_conforme_sin_cubrir"
+}

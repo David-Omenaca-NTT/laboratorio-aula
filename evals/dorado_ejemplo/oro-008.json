@@ -1,0 +1,23 @@
+{
+  "id": "oro-008",
+  "titulo": "Toca el manifiesto del agente",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-01"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "manifiestos/conformidad-spec.yaml",
+      "contenido": "nivel_autonomia: N4\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_a():\n    \"\"\"cubre: SPEC-002/CA-01\"\"\"\n    assert z == 2\n"
+    }
+  ],
+  "etiqueta": "no_conforme_alcance"
+}

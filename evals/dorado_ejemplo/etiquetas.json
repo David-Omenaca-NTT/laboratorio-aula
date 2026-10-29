@@ -1,0 +1,17 @@
+{
+  "oro-001": "conforme",
+  "oro-002": "conforme",
+  "oro-003": "conforme",
+  "oro-004": "no_conforme_sin_cubrir",
+  "oro-005": "no_conforme_sin_cubrir",
+  "oro-006": "no_conforme_sin_cubrir",
+  "oro-007": "no_conforme_alcance",
+  "oro-008": "no_conforme_alcance",
+  "oro-009": "no_conforme_alcance",
+  "oro-010": "no_conforme_riesgo",
+  "oro-011": "no_conforme_riesgo",
+  "oro-012": "no_conforme_riesgo",
+  "oro-013": "no_conforme_riesgo",
+  "oro-014": "conforme",
+  "oro-015": "conforme_con_observaciones"
+}

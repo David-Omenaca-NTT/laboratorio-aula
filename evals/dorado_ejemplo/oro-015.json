@@ -1,0 +1,19 @@
+{
+  "id": "oro-015",
+  "titulo": "Frontera: type ignore, riesgo bajo sin no conformidad",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-01"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_a():  # type: ignore\n    \"\"\"cubre: SPEC-002/CA-01\"\"\"\n    assert nota_media_ponderada(e,p) == Decimal(\"8.00\")\n"
+    }
+  ],
+  "etiqueta": "conforme_con_observaciones"
+}

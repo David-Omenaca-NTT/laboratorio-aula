@@ -1,0 +1,19 @@
+{
+  "id": "oro-014",
+  "titulo": "Frontera: cubre justo lo declarado y nada mas",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-04"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_redondeo():\n    \"\"\"cubre: SPEC-002/CA-04\"\"\"\n    assert nota_media_ponderada(e,p) == Decimal(\"7.33\")\n"
+    }
+  ],
+  "etiqueta": "conforme"
+}

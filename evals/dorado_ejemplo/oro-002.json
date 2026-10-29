@@ -1,0 +1,20 @@
+{
+  "id": "oro-002",
+  "titulo": "Dos criterios cubiertos",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-01",
+    "CA-04"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_a():\n    \"\"\"cubre: SPEC-002/CA-01\"\"\"\n    assert x == Decimal(\"8.00\")\n\ndef test_b():\n    \"\"\"cubre: SPEC-002/CA-04\"\"\"\n    assert y == Decimal(\"7.33\")\n"
+    }
+  ],
+  "etiqueta": "conforme"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "oro-007",
+  "titulo": "Toca el pipeline",
+  "spec": "SPEC-002",
+  "criterios_declarados": [
+    "CA-01"
+  ],
+  "ficheros": [
+    {
+      "ruta": "src/aula/reglas/media.py",
+      "contenido": "return _redondear(num/den)\n"
+    },
+    {
+      "ruta": ".github/workflows/ci.yml",
+      "contenido": "on: push\n"
+    },
+    {
+      "ruta": "tests/test_media_expediente.py",
+      "contenido": "def test_a():\n    \"\"\"cubre: SPEC-002/CA-01\"\"\"\n    assert z == 2\n"
+    }
+  ],
+  "etiqueta": "no_conforme_alcance"
+}
