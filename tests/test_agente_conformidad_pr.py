@@ -1,4 +1,7 @@
 import json
+import subprocess
+import sys
+from pathlib import Path
 
 from agentes.conformidad.agente import principal
 
@@ -28,3 +31,16 @@ def test_agente_emite_veredicto_json_conforme(tmp_path, capsys):
     assert codigo == 0
     assert resultado["veredicto"] == "conforme"
     assert resultado["criterios_cubiertos"] == ["CA-01"]
+
+
+def test_script_conformidad_importa_agente_desde_otro_directorio(tmp_path):
+    script = Path(__file__).resolve().parents[1] / "herramientas" / "conformidad_pr.py"
+    resultado = subprocess.run(
+        [sys.executable, str(script), "--help"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert resultado.returncode == 0
