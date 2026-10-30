@@ -103,7 +103,7 @@ jobs:
             --base "origin/$BASE_REF" \
             --cuerpo "$RUNNER_TEMP/pr-body.md"
 
-    build-imagen:
+  build-imagen:
     name: Construir y probar imagen
     needs: tests
     permissions:
