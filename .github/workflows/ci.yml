@@ -53,23 +53,55 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: ${{ vars.PROJECT_DIR || '.' }}
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Instalar dependencias
+        working-directory: ${{ env.PROJECT_DIR }}
         run: python -m pip install -r requirements.txt
 
       - name: Ejecutar tests y exigir cobertura de dominio superior al 60 %
+        working-directory: ${{ env.PROJECT_DIR }}
         run: >-
           python -m pytest tests/ -q
           --cov=src/aula/dominio
           --cov-report=term-missing
           --cov-fail-under=61
+
+      - name: Preparar descripción de la PR
+        if: contains(github.event.pull_request.labels.*.name, 'revisar-conformidad')
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          PR_BODY_PATH: ${{ runner.temp }}/pr-body.md
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
+          body = event["pull_request"].get("body") or ""
+          Path(os.environ["PR_BODY_PATH"]).write_text(body, encoding="utf-8")
+          PY
+
+      - name: Revisar conformidad
+        if: contains(github.event.pull_request.labels.*.name, 'revisar-conformidad')
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          python herramientas/conformidad_pr.py \
+            --base "origin/$BASE_REF" \
+            --cuerpo "$RUNNER_TEMP/pr-body.md"
 
   build-imagen:
     name: Construir y probar imagen
