@@ -23,7 +23,9 @@ def metadatos(cuerpo: str) -> tuple[str, list[str]]:
 
 def archivos(base: str) -> list[dict]:
     rutas = subprocess.check_output(
-        ["git", "diff", "--name-only", f"{base}...HEAD"], cwd=RAIZ, text=True
+        ["git", "diff", "--name-only", "--relative", f"{base}...HEAD"],
+        cwd=RAIZ,
+        text=True,
     ).splitlines()
     salida = []
     for ruta in rutas:
