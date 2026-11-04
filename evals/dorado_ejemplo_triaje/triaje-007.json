@@ -1,0 +1,7 @@
+{
+  "run_id": "run-007",
+  "resultado_tests": {
+    "summary": "make failed during compilation"
+  },
+  "logs": "gcc: error: invalid argument"
+}

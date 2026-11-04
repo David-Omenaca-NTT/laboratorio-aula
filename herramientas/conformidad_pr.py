@@ -8,6 +8,9 @@ import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(RAIZ))
+
+from agentes.conformidad.agente import principal
 
 
 def metadatos(cuerpo: str) -> tuple[str, list[str]]:
@@ -48,8 +51,6 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     entrada = {"id": "pr", "ficheros": archivos(args.base), "criterios_declarados": criterios}
     Path(args.salida).write_text(json.dumps(entrada, ensure_ascii=False), encoding="utf-8")
-    from agentes.conformidad.agente import principal
-
     return principal(["--pr", args.salida, "--spec", spec, "--json"])
 
 

@@ -1,0 +1,13 @@
+{
+  "run_id": "run-003",
+  "resultado_tests": {
+    "summary": "se detecta deuda de cobertura para SPEC-005"
+  },
+  "trazabilidad": {
+    "spec": "SPEC-005",
+    "sin_cubrir": [
+      "CA-03"
+    ],
+    "cobertura_pct": 82
+  }
+}

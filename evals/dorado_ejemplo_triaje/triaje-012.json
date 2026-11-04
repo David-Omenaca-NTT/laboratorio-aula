@@ -1,0 +1,7 @@
+{
+  "run_id": "run-012",
+  "resultado_tests": {
+    "summary": "pytest error in test_reglas"
+  },
+  "error": "Traceback (most recent call last):\n  File ...\nAssertionError"
+}
