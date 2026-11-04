@@ -1,0 +1,13 @@
+{
+  "run_id": "run-011",
+  "resultado_tests": {
+    "summary": "coverage gap in SPEC-006/CA-02"
+  },
+  "trazabilidad": {
+    "spec": "SPEC-006",
+    "sin_cubrir": [
+      "CA-02"
+    ],
+    "cobertura_pct": 90
+  }
+}

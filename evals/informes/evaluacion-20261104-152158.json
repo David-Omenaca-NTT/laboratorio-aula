@@ -1,0 +1,108 @@
+{
+  "agente": "triaje",
+  "fecha": "2026-11-04",
+  "casos": 15,
+  "aciertos": 15,
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "matriz": {
+    "vp": 4,
+    "fp": 0,
+    "vn": 11,
+    "fn": 0
+  },
+  "detalle": [
+    {
+      "caso": "triaje-001",
+      "esperado": "cobertura_spec",
+      "obtenido": "cobertura_spec",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-002",
+      "esperado": "cobertura_spec",
+      "obtenido": "cobertura_spec",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-003",
+      "esperado": "cobertura_spec",
+      "obtenido": "cobertura_spec",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-004",
+      "esperado": "tests",
+      "obtenido": "tests",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-005",
+      "esperado": "tests",
+      "obtenido": "tests",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-006",
+      "esperado": "build",
+      "obtenido": "build",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-007",
+      "esperado": "build",
+      "obtenido": "build",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-008",
+      "esperado": "infraestructura",
+      "obtenido": "infraestructura",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-009",
+      "esperado": "infraestructura",
+      "obtenido": "infraestructura",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-010",
+      "esperado": "desconocido",
+      "obtenido": "desconocido",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-011",
+      "esperado": "cobertura_spec",
+      "obtenido": "cobertura_spec",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-012",
+      "esperado": "tests",
+      "obtenido": "tests",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-013",
+      "esperado": "build",
+      "obtenido": "build",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-014",
+      "esperado": "infraestructura",
+      "obtenido": "infraestructura",
+      "resultado": "acierto"
+    },
+    {
+      "caso": "triaje-015",
+      "esperado": "desconocido",
+      "obtenido": "desconocido",
+      "resultado": "acierto"
+    }
+  ]
+}

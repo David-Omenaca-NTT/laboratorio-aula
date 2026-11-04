@@ -1,0 +1,7 @@
+{
+  "run_id": "run-014",
+  "resultado_tests": {
+    "summary": "permission denied on runner"
+  },
+  "logs": "/bin/sh: Permission denied"
+}
