@@ -1,9 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 -m pytest*)",
-      "Bash(python3 -m aula_cli check*)",
-      "Bash(python3 -m agentes.conformidad.evaluar*)",
+      "Bash(python -m pytest*)",
+      "Bash(python -m aula_cli check*)",
+      "Bash(python -m agentes.conformidad.evaluar*)",
       "Bash(git status*)",
       "Bash(git diff*)",
       "Bash(git log*)"
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 herramientas/hook_formato.py"
+            "command": "python herramientas/hook_formato.py"
           }
         ]
       }
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 herramientas/hook_rutas.py"
+            "command": "python herramientas/hook_rutas.py"
           }
         ]
       },
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 herramientas/hook_tests_commit.py"
+            "command": "python herramientas/hook_tests_commit.py"
           }
         ]
       }
