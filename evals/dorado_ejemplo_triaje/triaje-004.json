@@ -1,0 +1,7 @@
+{
+  "run_id": "run-004",
+  "resultado_tests": {
+    "summary": "test failed: AssertionError in test_validar_regla"
+  },
+  "error": "Traceback... assertion ..."
+}

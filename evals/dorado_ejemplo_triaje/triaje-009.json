@@ -1,0 +1,7 @@
+{
+  "run_id": "run-009",
+  "resultado_tests": {
+    "summary": "runner lost connection and timed out"
+  },
+  "logs": "The job was canceled after 30m"
+}

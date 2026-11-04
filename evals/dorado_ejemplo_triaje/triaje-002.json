@@ -1,0 +1,13 @@
+{
+  "run_id": "run-002",
+  "resultado_tests": {
+    "summary": "cobertura: SPEC-004/INV-02 missing test"
+  },
+  "trazabilidad": {
+    "spec": "SPEC-004",
+    "sin_cubrir": [
+      "INV-02"
+    ],
+    "cobertura_pct": 70
+  }
+}

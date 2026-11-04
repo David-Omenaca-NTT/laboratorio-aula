@@ -1,0 +1,7 @@
+{
+  "run_id": "run-006",
+  "resultado_tests": {
+    "summary": "docker build failed: incompatible dependency"
+  },
+  "logs": "Step 5/7 : RUN pip install ..."
+}
