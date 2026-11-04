@@ -1,0 +1,7 @@
+{
+  "run_id": "run-013",
+  "resultado_tests": {
+    "summary": "pip install failed during build"
+  },
+  "logs": "ERROR: Could not find a version that satisfies the requirement"
+}

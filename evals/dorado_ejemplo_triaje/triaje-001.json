@@ -1,0 +1,13 @@
+{
+  "run_id": "run-001",
+  "resultado_tests": {
+    "summary": "pytest failed: SPEC-003/CA-01 no test covers coverage"
+  },
+  "trazabilidad": {
+    "spec": "SPEC-003",
+    "sin_cubrir": [
+      "CA-01"
+    ],
+    "cobertura_pct": 80
+  }
+}
