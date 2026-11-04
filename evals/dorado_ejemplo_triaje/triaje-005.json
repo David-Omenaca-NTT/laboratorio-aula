@@ -1,0 +1,7 @@
+{
+  "run_id": "run-005",
+  "resultado_tests": {
+    "summary": "failed: test_orden_media"
+  },
+  "logs": "E assert Decimal('7.00') == Decimal('8.00')"
+}
