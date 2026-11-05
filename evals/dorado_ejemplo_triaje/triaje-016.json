@@ -1,0 +1,6 @@
+{
+  "run_id": "41058648284",
+  "resultado_tests": {
+    "summary": "53 passed, 1 warning. Required test coverage of 61% reached. Total coverage: 91.67%. Run python -m pip install -r requirements.txt. Revisar conformidad: Traceback. ModuleNotFoundError: No module named 'agentes'. Process completed with exit code 1."
+  }
+}
