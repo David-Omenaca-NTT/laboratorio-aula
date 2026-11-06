@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "matcher": "bash|powershell",
+        "powershell": "python herramientas/hook_tests_commit.py",
+        "bash": "python herramientas/hook_tests_commit.py",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}

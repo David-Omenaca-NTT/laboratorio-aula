@@ -1,0 +1,7 @@
+{
+  "run_id": "run-010",
+  "resultado_tests": {
+    "summary": "unexpected failure without clear origin"
+  },
+  "logs": "ValueError: something went wrong but no spec clue"
+}

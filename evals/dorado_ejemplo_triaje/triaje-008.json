@@ -1,0 +1,7 @@
+{
+  "run_id": "run-008",
+  "resultado_tests": {
+    "summary": "docker: network timeout while pulling image"
+  },
+  "logs": "Error response from daemon: Get \"https://...\": dial tcp ... timeout"
+}

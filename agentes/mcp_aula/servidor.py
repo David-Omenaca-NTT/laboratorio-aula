@@ -49,10 +49,13 @@ HERRAMIENTAS = [
     },
     {
         "name": "resultado_tests",
-        "description": "Ejecuta la suite y devuelve el resultado agregado y los tests fallidos.",
+        "description": "Ejecuta la suite o consulta un run_id de GitHub Actions y devuelve el resultado agregado y los tests fallidos.",
         "inputSchema": {
             "type": "object",
-            "properties": {"ruta": {"type": "string", "description": "Subconjunto opcional de tests"}},
+            "properties": {
+                "run_id": {"type": "string", "description": "Identificador del run de GitHub Actions"},
+                "ruta": {"type": "string", "description": "Subconjunto opcional de tests"},
+            },
             "required": [],
         },
     },
@@ -151,7 +154,57 @@ def trazabilidad(args: dict) -> dict:
 
 
 def resultado_tests(args: dict) -> dict:
-    raise NotImplementedError("S4a: ejecutar tests con limites de rutas y recursos")
+    run_id = args.get("run_id")
+    ruta = args.get("ruta")
+
+    if run_id:
+        try:
+            resumen = subprocess.run(
+                ["gh", "run", "view", str(run_id), "--json", "name,conclusion,status,displayTitle,url,workflowName,headBranch,headSha"],
+                capture_output=True,
+                text=True,
+                timeout=60,
+                check=False,
+            )
+            if resumen.returncode != 0:
+                return {
+                    "run_id": str(run_id),
+                    "status": "error",
+                    "error": resumen.stderr.strip() or "gh no disponible",
+                }
+            payload = json.loads(resumen.stdout or "{}")
+            logs = subprocess.run(
+                ["gh", "run", "view", str(run_id), "--log-failed"],
+                capture_output=True,
+                text=True,
+                timeout=60,
+                check=False,
+            )
+            if logs.returncode != 0:
+                return {
+                    "run_id": str(run_id),
+                    "status": "error",
+                    "error": logs.stderr.strip() or "No se pudieron recuperar los logs del run",
+                }
+            payload["logs"] = logs.stdout.strip() if logs.stdout else ""
+            payload["run_id"] = str(run_id)
+            payload["evidencia"] = payload.get("logs", "")
+            return payload
+        except Exception as exc:
+            return {"run_id": str(run_id), "status": "error", "error": str(exc)}
+
+    comando = [sys.executable, "-m", "pytest", "-q"]
+    if ruta:
+        comando.append(ruta)
+    proceso = subprocess.run(comando, capture_output=True, text=True, timeout=180)
+    salida = (proceso.stdout or "") + (proceso.stderr or "")
+    return {
+        "status": "passed" if proceso.returncode == 0 else "failed",
+        "returncode": proceso.returncode,
+        "ruta": ruta,
+        "summary": salida.strip()[-4000:],
+        "evidencia": salida.strip(),
+    }
 
 
 def version_plan(args: dict) -> dict:
