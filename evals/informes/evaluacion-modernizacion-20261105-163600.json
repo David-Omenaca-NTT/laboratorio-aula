@@ -1,0 +1,201 @@
+{
+  "agente": "modernizacion",
+  "fecha": "2026-11-05",
+  "casos": 12,
+  "accuracy_decision": 1.0,
+  "accuracy_handoff": 1.0,
+  "matriz_handoff": {
+    "vp": 2,
+    "fp": 0,
+    "vn": 10,
+    "fn": 0
+  },
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "latencia_media_ms": 0.093,
+  "coste_usd_por_ejecucion": 0.0,
+  "juez": "offline",
+  "detalle": [
+    {
+      "caso": "modernizacion-001",
+      "esperado": {
+        "decision": "aprobable",
+        "handoff": true
+      },
+      "obtenido": {
+        "decision": "aprobable",
+        "handoff": true
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-002",
+      "esperado": {
+        "decision": "caracterizacion_rota",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "caracterizacion_rota",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-003",
+      "esperado": {
+        "decision": "equivalencia_rota",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "equivalencia_rota",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-004",
+      "esperado": {
+        "decision": "fuera_de_alcance",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "fuera_de_alcance",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-005",
+      "esperado": {
+        "decision": "desviacion_no_justificada",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "desviacion_no_justificada",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-006",
+      "esperado": {
+        "decision": "evidencia_insuficiente",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "evidencia_insuficiente",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-007",
+      "esperado": {
+        "decision": "aprobable",
+        "handoff": true
+      },
+      "obtenido": {
+        "decision": "aprobable",
+        "handoff": true
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-008",
+      "esperado": {
+        "decision": "caracterizacion_rota",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "caracterizacion_rota",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-009",
+      "esperado": {
+        "decision": "equivalencia_rota",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "equivalencia_rota",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-010",
+      "esperado": {
+        "decision": "fuera_de_alcance",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "fuera_de_alcance",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-011",
+      "esperado": {
+        "decision": "desviacion_no_justificada",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "desviacion_no_justificada",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "modernizacion-012",
+      "esperado": {
+        "decision": "evidencia_insuficiente",
+        "handoff": false
+      },
+      "obtenido": {
+        "decision": "evidencia_insuficiente",
+        "handoff": false
+      },
+      "resultado": {
+        "decision": true,
+        "handoff": true
+      }
+    }
+  ]
+}

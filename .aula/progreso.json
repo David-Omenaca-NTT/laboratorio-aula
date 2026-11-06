@@ -46,6 +46,28 @@
       "sellada": "2026-10-23T07:25:31+00:00"
     },
     "S4a": {
+      "estado": "sellada",
+      "pistas": 0,
+      "intentos": 2,
+      "predicciones": {
+        "aciertos": 0,
+        "total": 0
+      },
+      "desbloqueada": false,
+      "sellada": "2026-11-05T15:00:43+00:00"
+    },
+    "S4b": {
+      "estado": "sellada",
+      "pistas": 0,
+      "intentos": 1,
+      "predicciones": {
+        "aciertos": 0,
+        "total": 0
+      },
+      "desbloqueada": false,
+      "sellada": "2026-11-05T15:00:57+00:00"
+    },
+    "S5": {
       "estado": "en curso",
       "pistas": 0,
       "intentos": 1,

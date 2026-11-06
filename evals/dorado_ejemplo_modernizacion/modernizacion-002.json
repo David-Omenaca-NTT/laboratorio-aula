@@ -1,0 +1,9 @@
+{
+  "ruta": "src/aula/legado/calculadora_expediente_v1.py",
+  "bateria": "tests/test_caracterizacion_legado.py",
+  "spec_id": "SPEC-002",
+  "resultado_caracterizacion": {"status": "failed", "summary": "1 failed, 8 passed"},
+  "resultado_equivalencia": {"status": "unknown"},
+  "archivos_modificados": ["src/aula/legado/calculadora_expediente_v1.py"],
+  "desviaciones": []
+}

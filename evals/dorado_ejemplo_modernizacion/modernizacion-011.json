@@ -1,0 +1,12 @@
+{
+  "ruta": "src/aula/legado/calculadora_expediente_v1.py",
+  "bateria": "tests/test_caracterizacion_legado.py",
+  "spec_id": "SPEC-002",
+  "resultado_caracterizacion": {"status": "passed"},
+  "resultado_equivalencia": {"status": "passed"},
+  "archivos_modificados": ["src/aula/legado/calculadora_expediente_v1.py"],
+  "desviaciones": [
+    {"descripcion": "Redondeo preservado", "justificacion": "Compatibilidad con resultados historicos."},
+    {"descripcion": "Exportador retirado", "justificacion": " "}
+  ]
+}
