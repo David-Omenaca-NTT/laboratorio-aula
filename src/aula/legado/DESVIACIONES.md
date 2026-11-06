@@ -95,3 +95,24 @@ de cálculo decimal y redondeo establecidas por la especificación.
 
 Determinados expedientes situados en fronteras de redondeo pueden presentar una
 diferencia de `0.01` en `progreso_pct`. Los créditos superados no se modifican.
+
+---
+
+## Evidencia estructurada para el agente de Modernización
+
+```json
+[
+  {
+    "descripcion": "D-01 - Convalidaciones",
+    "justificacion": "Corrección deliberada del comportamiento legado conforme a SPEC-002/CA-03."
+  },
+  {
+    "descripcion": "D-02 - Redondeo de la nota media",
+    "justificacion": "Corrección deliberada del redondeo intermedio legado conforme a SPEC-002/INV-01 y CA-04."
+  },
+  {
+    "descripcion": "D-03 - Redondeo del porcentaje de progreso",
+    "justificacion": "Corrección deliberada de la aritmética float del legado conforme a SPEC-002/INV-01, INV-02 y CA-06."
+  }
+]
+```
