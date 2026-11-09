@@ -180,6 +180,12 @@ def resultado_tests(args: dict) -> dict:
                 timeout=60,
                 check=False,
             )
+            if logs.returncode != 0:
+                return {
+                    "run_id": str(run_id),
+                    "status": "error",
+                    "error": logs.stderr.strip() or "no se pudieron obtener los logs",
+                }
             payload["logs"] = logs.stdout.strip() if logs.stdout else ""
             payload["run_id"] = str(run_id)
             payload["evidencia"] = payload.get("logs", "")
