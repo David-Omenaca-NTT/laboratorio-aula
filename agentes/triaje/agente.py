@@ -142,47 +142,16 @@ def _clasificacion_por_evidencia(texto: str, spec_id: str | None) -> tuple[str, 
     )
     if cobertura and spec_id:
         return "cobertura_spec", spec_id
-
     if cobertura and not spec_id:
         return "cobertura_spec", None
-
-    if any(token in texto_normal for token in [
-        "build failed",
-        "failed to build",
-        "error while building",
-        "compilation failed",
-        "compilation error",
-        "failed during compilation",
-        "failed during build",
-    ]):
+    if any(token in texto_normal for token in ["docker build", "build failed", "compilation", "make", "pip install", "npm install", "error while building", "failed to build"]):
         return "build", spec_id
-
-    if any(token in texto_normal for token in [
-        "assertionerror",
-        "test failed",
-        "tests failed",
-        "failed test",
-        "failed: test_",
-        "error in test",
-        "failed assertions",
-    ]):
+    if any(token in texto_normal for token in ["assertion", "failed", "test failed", "error in test", "traceback", "pytest", "assert "]):
         return "tests", spec_id
-
-    if any(token in texto_normal for token in [
-        "docker",
-        "network",
-        "timeout",
-        "runner",
-        "permission denied",
-        "no space left",
-        "unavailable",
-        "infraestructura",
-        "service unavailable",
-        "connection reset",
-    ]):
+    if any(token in texto_normal for token in ["docker", "network", "timeout", "runner", "permission denied", "no space left", "unavailable", "infraestructura", "service unavailable", "connection reset"]):
         return "infraestructura", spec_id
-
     return "desconocido", spec_id
+
 
 def _determinar_spec_id(contexto: dict[str, Any], texto: str) -> str | None:
     spec_id = _detectar_spec_id(contexto)
