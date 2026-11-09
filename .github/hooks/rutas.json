@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "matcher": "edit|create",
+        "powershell": "python herramientas/hook_rutas.py",
+        "bash": "python herramientas/hook_rutas.py",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

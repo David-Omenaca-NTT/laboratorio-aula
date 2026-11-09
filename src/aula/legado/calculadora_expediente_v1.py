@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # calculadora_expediente_v1.py
-# Modulo heredado. Sin tests. Sin documentacion de reglas.
+# Modulo heredado. Comportamiento historico caracterizado por tests.
 # NO TOCAR sin caracterizar antes: hay comportamiento del que depende
 # el proceso de becas.
 #
@@ -31,9 +31,8 @@ def _log(msg):
 
 
 def cargar_plan(ruta):
-    f = open(ruta, "r", encoding="utf-8")
-    d = json.load(f)
-    f.close()
+    with open(ruta, "r", encoding="utf-8") as f:
+        d = json.load(f)
     m = {}
     for a in d["asignaturas"]:
         m[a["codigo"]] = a
@@ -47,26 +46,25 @@ def creditos_de(mapa, cod):
 
 
 def es_aprobada(reg):
-    if reg["estado"] == "aprobada":
-        return True
-    if reg["estado"] == "convalidada":
-        return True
-    return False
+    return (
+        reg["estado"] == "aprobada"
+        or reg["estado"] == "convalidada"
+    )
 
 
 def ultima_aprobada(regs, cod):
-    r = None
-    for x in regs:
-        if x["codigo_asignatura"] != cod:
+    seleccionada = None
+    for registro in regs:
+        if registro["codigo_asignatura"] != cod:
             continue
-        if x["estado"] != "aprobada":
+        if registro["estado"] != "aprobada":
             continue
-        if r is None:
-            r = x
+        if seleccionada is None:
+            seleccionada = registro
         else:
-            if x["convocatoria"] > r["convocatoria"]:
-                r = x
-    return r
+            if registro["convocatoria"] > seleccionada["convocatoria"]:
+                seleccionada = registro
+    return seleccionada
 
 
 def hay_convalidacion(regs, cod):
@@ -78,77 +76,76 @@ def hay_convalidacion(regs, cod):
 
 def media(expediente, mapa):
     # numerador y denominador
-    num = 0.0
-    den = 0.0
-    vistos = {}
-    for reg in expediente["registros"]:
-        cod = reg["codigo_asignatura"]
-        if cod in vistos:
+    numerador = 0.0
+    denominador = 0.0
+    vistos = set()
+    for registro in expediente["registros"]:
+        codigo = registro["codigo_asignatura"]
+        if codigo in vistos:
             continue
-        cr = creditos_de(mapa, cod)
-        if cr == 0:
+        creditos = creditos_de(mapa, codigo)
+        if creditos == 0:
             continue
-        if hay_convalidacion(expediente["registros"], cod):
+        if hay_convalidacion(expediente["registros"], codigo):
             # COMPORTAMIENTO NO DOCUMENTADO 1
             # la convalidada suma en el numerador con nota fija 5.0 pero
             # NO suma en el denominador. nadie recuerda por que.
-            num = num + NOTA_CONVALIDADA * cr
-            vistos[cod] = 1
+            numerador = numerador + NOTA_CONVALIDADA * creditos
+            vistos.add(codigo)
             continue
-        ua = ultima_aprobada(expediente["registros"], cod)
-        if ua is None:
+        ultima = ultima_aprobada(expediente["registros"], codigo)
+        if ultima is None:
             continue
-        if ua.get("nota") is None:
+        if ultima.get("nota") is None:
             continue
         # COMPORTAMIENTO NO DOCUMENTADO 2
         # el redondeo se aplica aqui, por asignatura, antes de acumular.
         # de este redondeo depende la ordenacion de becas.
-        n = round(float(ua["nota"]), DEC)
-        num = num + n * cr
-        den = den + cr
-        vistos[cod] = 1
-    if den == 0:
+        nota_redondeada = round(float(ultima["nota"]), DEC)
+        numerador = numerador + nota_redondeada * creditos
+        denominador = denominador + creditos
+        vistos.add(codigo)
+    if denominador == 0:
         return 0.0
-    return round(num / den, DEC)
+    return round(numerador / denominador, DEC)
 
 
 def creditos_superados(expediente, mapa):
-    total = 0
-    hechos = {}
-    for reg in expediente["registros"]:
-        cod = reg["codigo_asignatura"]
-        if cod in hechos:
+    creditos_total = 0
+    hechos = set()
+    for registro in expediente["registros"]:
+        codigo = registro["codigo_asignatura"]
+        if codigo in hechos:
             continue
-        if es_aprobada(reg):
-            total = total + creditos_de(mapa, cod)
-            hechos[cod] = 1
-    return total
+        if es_aprobada(registro):
+            creditos_total = creditos_total + creditos_de(mapa, codigo)
+            hechos.add(codigo)
+    return creditos_total
 
 
 def progreso(expediente, plan, mapa):
-    tot = plan["creditos_titulo"]
-    if tot == 0:
+    creditos_titulo = plan["creditos_titulo"]
+    if creditos_titulo == 0:
         return 0.0
-    return round((creditos_superados(expediente, mapa) * 100.0) / tot, DEC)
+    return round((creditos_superados(expediente, mapa) * 100.0) / creditos_titulo, DEC)
 
 
 def convocatorias(expediente):
-    d = {}
-    for reg in expediente["registros"]:
-        cod = reg["codigo_asignatura"]
-        if reg["estado"] == "convalidada":
+    conteo = {}
+    for registro in expediente["registros"]:
+        codigo = registro["codigo_asignatura"]
+        if registro["estado"] == "convalidada":
             continue
-        if cod not in d:
-            d[cod] = 0
-        d[cod] = d[cod] + 1
-    return d
+        if codigo not in conteo:
+            conteo[codigo] = 0
+        conteo[codigo] = conteo[codigo] + 1
+    return conteo
 
 
 def puede_matricular(expediente, cod):
     c = convocatorias(expediente)
     if cod in c:
-        if c[cod] >= MAX_CONV:
-            return False
+        return not (c[cod] >= MAX_CONV)
     return True
 
 

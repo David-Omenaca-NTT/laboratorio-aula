@@ -20,38 +20,5 @@
       "Edit(src/aula/legado/**)",
       "Write(src/aula/legado/**)"
     ]
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python herramientas/hook_formato.py"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python herramientas/hook_rutas.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python herramientas/hook_tests_commit.py"
-          }
-        ]
-      }
-    ]
   }
 }
