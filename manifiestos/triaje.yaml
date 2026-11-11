@@ -1,0 +1,64 @@
+agente: triaje
+version: 1.0.0
+propietario_humano: David Omenaca Ayuso
+codigo:
+  ruta: agentes/triaje/agente.py
+  hash_sha256: 395a96f71173b0dd64324efc5731ef2d8a0c55bab161a6ec26ff7897a9566489
+proposito: >
+  Analiza la evidencia de una ejecucion fallida, clasifica el fallo, formula
+  una hipotesis, identifica el spec_id cuando procede y genera un handoff hacia
+  Conformidad cuando detecta una brecha de cobertura.
+nivel_autonomia: N2
+control_que_lo_fuerza:
+  tecnicos:
+    - ejecucion acotada al flujo de Triaje
+    - workflow activado ante un fallo de CI asociado a una pull request
+    - permisos de lectura de acciones y contenido del repositorio
+    - ausencia de operaciones de escritura en el agente
+    - settings y hook que restringen la modificacion de rutas protegidas
+  organizativos:
+    - proteccion de rama y revision humana no demostradas como controles tecnicos
+herramientas:
+  - workflow: .github/workflows/triaje.yml
+    uso: obtiene evidencia de la ejecucion mediante resultado_tests y se la proporciona al agente
+  - cli: gh
+    uso: recupera metadatos y logs fallidos del run_id
+  - agente: agentes/triaje/agente.py
+    operaciones: [clasificar_fallo, analizar]
+
+datos_accesibles:
+  - run_id
+  - evidencia del pipeline proporcionada al agente
+  - logs y resultados de tests proporcionados al agente
+  - trazabilidad cuando forma parte del contexto
+  - referencias SPEC-* presentes en la evidencia
+datos_prohibidos:
+  - modificacion de manifiestos/** mediante los controles locales existentes
+  - modificacion de .github/workflows/** mediante los controles locales existentes
+  - modificacion de evals/dorado*/** mediante los controles locales existentes
+  - modificacion de src/aula/legado/** mediante los controles locales existentes
+
+evaluacion:
+  conjunto: evals/dorado_ejemplo_triaje
+  informe: evals/informes/evaluacion-20261111-145352.json
+  casos: 16
+  accuracy_clasificacion: 1.0
+  accuracy_spec_id: 1.0
+  accuracy_handoff: 1.0
+  precision: 1.0
+  recall: 1.0
+  f1: 1.0
+  fecha: 2026-11-11
+  caducidad_dias: 30
+
+coste:
+  juez: offline
+  medio_por_ejecucion_usd: 0.0
+  nota: La evaluacion actual es determinista y no declara consumo de tokens ni APIs de pago.
+
+reversion:
+  procedimiento: >
+    Deshabilitar el workflow y la integracion de Triaje, volver a la version
+    anterior del agente y mantener activos los controles de gobierno.
+  responsable: David Omenaca Ayuso
+  tiempo_objetivo_min: 5
