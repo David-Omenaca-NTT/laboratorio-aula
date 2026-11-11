@@ -1,0 +1,54 @@
+agente: conformidad
+version: 1.0.0
+propietario_humano: David Omenaca Ayuso
+codigo:
+  ruta: agentes/conformidad/agente.py
+  hash_sha256: 77c5aa47e05d5e993732cd211851b031d962a26c5ee2705f75ef1517b3185b4a
+proposito: >
+  Evalua la conformidad de una PR respecto de la especificacion que declara
+  implementar y emite un veredicto estructurado.
+nivel_autonomia: N3
+control_que_lo_fuerza:
+  tecnicos:
+    - ejecucion en worktree separado
+    - settings y hook que bloquean la modificacion de manifiestos/ y .github/workflows/
+  organizativos:
+    - revision humana de los cambios de gobierno
+    - proteccion de rama y gate de merge no verificados en este worktree
+herramientas:
+  - mcp: aula-contexto
+    operaciones: [listar_specs, obtener_spec, trazabilidad]
+
+datos_accesibles:
+  - specs/**
+  - tests/**
+  - diff y metadatos de la PR evaluada
+  - resultados de tests y trazabilidad proporcionados por aula-contexto
+datos_prohibidos:
+  - modificacion de manifiestos/** mediante los controles locales existentes
+  - modificacion de .github/workflows/** mediante los controles locales existentes
+  - modificacion de evals/dorado*/** mediante los controles locales existentes
+  - modificacion de src/aula/legado/** mediante los controles locales existentes
+
+evaluacion:
+  conjunto: evals/dorado_ejemplo
+  informe: evals/informes/evaluacion-20261110-174137.json
+  casos: 15
+  precision: 1.0
+  recall: 1.0
+  f1: 1.0
+  fecha: 2026-11-10
+  caducidad_dias: 30
+
+coste:
+  juez: offline
+  medio_por_ejecucion_usd: 0.0
+  tope_diario_usd: 3.0
+  nota: El agente actual es determinista y no consume tokens ni APIs externas.
+
+reversion:
+  procedimiento: >
+    Revertir la version desplegada, deshabilitar la integracion del agente y
+    mantener activo el gate de validacion del manifiesto.
+  responsable: David Omenaca Ayuso
+  tiempo_objetivo_min: 5
