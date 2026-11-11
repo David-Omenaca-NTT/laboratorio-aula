@@ -1,3 +1,4 @@
+# PRUEBA TEMPORAL S6: caso positivo del gate de manifiestos.
 """Agente de triaje para clasificar fallos de pipeline.
 
 Entrada esperada:
