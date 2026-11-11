@@ -3,7 +3,7 @@ version: 1.0.0
 propietario_humano: David Omenaca Ayuso
 codigo:
   ruta: agentes/modernizacion/agente.py
-  hash_sha256: b4bee91c000f3142bd1a6bde6c18502a3654480a54127c9e7846fd30353f94be
+  hash_sha256: cb95df22fd4fbcb4efa358c323ef15d23cd13c8468c1314de20bdddc6c0555d4
 proposito: >
   Analiza evidencia de una modernizacion o refactorizacion, comprueba la
   caracterizacion y la equivalencia, valida el alcance de los archivos
@@ -22,7 +22,7 @@ control_que_lo_fuerza:
 herramientas:
   - workflow: .github/workflows/modernizacion.yml
     uso: ejecuta el flujo de Modernizacion con permisos de lectura
-  - pytest
+  - herramienta: pytest
     uso: ejecuta la bateria de caracterizacion y la prueba de equivalencia
   - git diff
     uso: determina los archivos modificados

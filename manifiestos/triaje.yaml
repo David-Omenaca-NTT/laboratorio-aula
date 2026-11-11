@@ -3,7 +3,7 @@ version: 1.0.0
 propietario_humano: David Omenaca Ayuso
 codigo:
   ruta: agentes/triaje/agente.py
-  hash_sha256: 395a96f71173b0dd64324efc5731ef2d8a0c55bab161a6ec26ff7897a9566489
+  hash_sha256: 8bc715255ded9760671c3ac6718ae0dcd1df4d131abc5550c83269e2a7352a30
 proposito: >
   Analiza la evidencia de una ejecucion fallida, clasifica el fallo, formula
   una hipotesis, identifica el spec_id cuando procede y genera un handoff hacia

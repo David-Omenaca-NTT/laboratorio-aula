@@ -3,7 +3,7 @@ version: 1.0.0
 propietario_humano: David Omenaca Ayuso
 codigo:
   ruta: agentes/conformidad/agente.py
-  hash_sha256: 77c5aa47e05d5e993732cd211851b031d962a26c5ee2705f75ef1517b3185b4a
+  hash_sha256: 6674193bc6ded9df9085cf149faf50b577375e322889c676e438163d5b2ba41c
 proposito: >
   Evalua la conformidad de una PR respecto de la especificacion que declara
   implementar y emite un veredicto estructurado.
