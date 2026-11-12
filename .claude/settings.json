@@ -1,9 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 -m pytest*)",
-      "Bash(python3 -m aula_cli check*)",
-      "Bash(python3 -m agentes.conformidad.evaluar*)",
+      "Bash(python -m pytest*)",
+      "Bash(python -m aula_cli check*)",
+      "Bash(python -m agentes.conformidad.evaluar*)",
       "Bash(git status*)",
       "Bash(git diff*)",
       "Bash(git log*)"
@@ -19,39 +19,6 @@
       "Write(evals/dorado*/**)",
       "Edit(src/aula/legado/**)",
       "Write(src/aula/legado/**)"
-    ]
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 herramientas/hook_formato.py"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 herramientas/hook_rutas.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 herramientas/hook_tests_commit.py"
-          }
-        ]
-      }
     ]
   }
 }

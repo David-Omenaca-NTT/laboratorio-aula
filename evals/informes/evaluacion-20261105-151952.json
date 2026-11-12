@@ -1,0 +1,310 @@
+{
+  "agente": "triaje",
+  "fecha": "2026-11-05",
+  "casos": 16,
+  "accuracy_clasificacion": 1.0,
+  "accuracy_spec_id": 1.0,
+  "accuracy_handoff": 1.0,
+  "matriz_handoff": {
+    "vp": 4,
+    "fp": 0,
+    "vn": 12,
+    "fn": 0
+  },
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "latencia_media_ms": 0.108,
+  "coste_usd_por_ejecucion": 0.0,
+  "juez": "offline",
+  "detalle": [
+    {
+      "caso": "triaje-001",
+      "esperado": {
+        "clasificacion": "cobertura_spec",
+        "spec_id": "SPEC-003",
+        "handoff": true
+      },
+      "obtenido": {
+        "clasificacion": "cobertura_spec",
+        "spec_id": "SPEC-003",
+        "handoff": true
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-002",
+      "esperado": {
+        "clasificacion": "cobertura_spec",
+        "spec_id": "SPEC-004",
+        "handoff": true
+      },
+      "obtenido": {
+        "clasificacion": "cobertura_spec",
+        "spec_id": "SPEC-004",
+        "handoff": true
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-003",
+      "esperado": {
+        "clasificacion": "cobertura_spec",
+        "spec_id": "SPEC-005",
+        "handoff": true
+      },
+      "obtenido": {
+        "clasificacion": "cobertura_spec",
+        "spec_id": "SPEC-005",
+        "handoff": true
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-004",
+      "esperado": {
+        "clasificacion": "tests",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "tests",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-005",
+      "esperado": {
+        "clasificacion": "tests",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "tests",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-006",
+      "esperado": {
+        "clasificacion": "build",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "build",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-007",
+      "esperado": {
+        "clasificacion": "build",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "build",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-008",
+      "esperado": {
+        "clasificacion": "infraestructura",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "infraestructura",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-009",
+      "esperado": {
+        "clasificacion": "infraestructura",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "infraestructura",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-010",
+      "esperado": {
+        "clasificacion": "desconocido",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "desconocido",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-011",
+      "esperado": {
+        "clasificacion": "cobertura_spec",
+        "spec_id": "SPEC-006",
+        "handoff": true
+      },
+      "obtenido": {
+        "clasificacion": "cobertura_spec",
+        "spec_id": "SPEC-006",
+        "handoff": true
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-012",
+      "esperado": {
+        "clasificacion": "tests",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "tests",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-013",
+      "esperado": {
+        "clasificacion": "build",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "build",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-014",
+      "esperado": {
+        "clasificacion": "infraestructura",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "infraestructura",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-015",
+      "esperado": {
+        "clasificacion": "desconocido",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "desconocido",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    },
+    {
+      "caso": "triaje-016",
+      "esperado": {
+        "clasificacion": "desconocido",
+        "spec_id": null,
+        "handoff": false
+      },
+      "obtenido": {
+        "clasificacion": "desconocido",
+        "spec_id": null,
+        "handoff": false
+      },
+      "resultado": {
+        "clasificacion": true,
+        "spec_id": true,
+        "handoff": true
+      }
+    }
+  ]
+}
