@@ -1,3 +1,4 @@
+# PRUEBA TEMPORAL S6: caso negativo sin ARM.
 """Agente de triaje para clasificar fallos de pipeline.
 
 Entrada esperada:
