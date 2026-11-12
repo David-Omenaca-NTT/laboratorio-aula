@@ -24,13 +24,13 @@ herramientas:
     uso: ejecuta el flujo de Modernizacion con permisos de lectura
   - herramienta: pytest
     uso: ejecuta la bateria de caracterizacion y la prueba de equivalencia
-  - git diff
+  - herramienta: git diff
     uso: determina los archivos modificados
-  - gh api
+  - herramienta: gh api
     uso: obtiene metadatos y localiza la PR asociada al commit
   - cli: agentes.modernizacion.agente
     uso: procesa la evidencia y emite la decision estructurada
-  - GITHUB_STEP_SUMMARY
+  - herramienta: GITHUB_STEP_SUMMARY
     uso: salida resumida del flujo cuando esta disponible
 
 datos_accesibles:
