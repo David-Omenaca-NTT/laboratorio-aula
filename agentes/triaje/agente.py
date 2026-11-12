@@ -1,3 +1,4 @@
+# PRUEBA TEMPORAL S6: caso negativo SHA incorrecto.
 """Agente de triaje para clasificar fallos de pipeline.
 
 Entrada esperada:
