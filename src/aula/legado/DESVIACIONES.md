@@ -116,3 +116,17 @@ diferencia de `0.01` en `progreso_pct`. Los créditos superados no se modifican.
   }
 ]
 ```
+
+## Evidencia de equivalencia
+
+La comprobación de equivalencia se ejecuta sobre un corpus reproducible de 500
+expedientes sintéticos.
+
+Las diferencias detectadas entre el comportamiento legado y el comportamiento
+modernizado se documentan mediante las desviaciones D-01, D-02 y D-03. El
+bloque JSON estructurado de este documento constituye la evidencia consumida
+por el agente de Modernización para comprobar que cada desviación dispone de
+una justificación explícita.
+
+La caracterización y la equivalencia se ejecutan como evidencias independientes
+antes de que el agente determine si la propuesta es aprobable.

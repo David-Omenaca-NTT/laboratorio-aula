@@ -1,0 +1,74 @@
+agente: modernizacion
+version: 1.0.0
+propietario_humano: David Omenaca Ayuso
+codigo:
+  ruta: agentes/modernizacion/agente.py
+  hash_sha256: cb95df22fd4fbcb4efa358c323ef15d23cd13c8468c1314de20bdddc6c0555d4
+proposito: >
+  Analiza evidencia de una modernizacion o refactorizacion, comprueba la
+  caracterizacion y la equivalencia, valida el alcance de los archivos
+  modificados y las desviaciones justificadas, emite una decision estructurada
+  y genera handoff hacia Conformidad cuando la decision es aprobable.
+nivel_autonomia: N3
+control_que_lo_fuerza:
+  tecnicos:
+    - agente determinista que no modifica codigo, crea ramas, hace commits ni hace push
+    - workflow con permisos de lectura para ejecutar la comprobacion
+    - validacion del alcance de las rutas por el agente
+    - settings y hook que restringen modificaciones sobre rutas protegidas
+  organizativos:
+    - proteccion remota de rama y revision humana obligatoria no demostradas
+    - propiedad exclusiva de escritura de Modernizacion sobre el legado no demostrada
+herramientas:
+  - workflow: .github/workflows/modernizacion.yml
+    uso: ejecuta el flujo de Modernizacion con permisos de lectura
+  - herramienta: pytest
+    uso: ejecuta la bateria de caracterizacion y la prueba de equivalencia
+  - herramienta: git diff
+    uso: determina los archivos modificados
+  - herramienta: gh api
+    uso: obtiene metadatos y localiza la PR asociada al commit
+  - cli: agentes.modernizacion.agente
+    uso: procesa la evidencia y emite la decision estructurada
+  - herramienta: GITHUB_STEP_SUMMARY
+    uso: salida resumida del flujo cuando esta disponible
+
+datos_accesibles:
+  - ruta del modulo legado
+  - bateria de caracterizacion
+  - spec_id
+  - resultados de caracterizacion
+  - resultados de equivalencia
+  - archivos modificados y diff
+  - metadatos de PR proporcionados por el flujo
+  - desviaciones y sus justificaciones
+  - contexto estructurado proporcionado al agente
+datos_prohibidos:
+  - modificacion de manifiestos/** mediante los controles locales existentes
+  - modificacion de .github/workflows/** mediante los controles locales existentes
+  - modificacion de evals/dorado*/** mediante los controles locales existentes
+  - modificacion de src/aula/legado/** mediante los controles locales existentes
+
+evaluacion:
+  conjunto: evals/dorado_ejemplo_modernizacion
+  informe: evals/informes/evaluacion-modernizacion-20261111-150340.json
+  casos: 12
+  accuracy_decision: 1.0
+  accuracy_handoff: 1.0
+  precision: 1.0
+  recall: 1.0
+  f1: 1.0
+  fecha: 2026-11-11
+  caducidad_dias: 30
+
+coste:
+  juez: offline
+  medio_por_ejecucion_usd: 0.0
+  nota: La evaluacion actual es determinista y no declara consumo de tokens ni APIs externas.
+
+reversion:
+  procedimiento: >
+    Deshabilitar el workflow y la integracion de Modernizacion, volver a la
+    version anterior del agente y mantener activos los controles de gobierno.
+  responsable: David Omenaca Ayuso
+  tiempo_objetivo_min: 5

@@ -70,6 +70,7 @@ def obtener_pr(repo: str, sha: str) -> tuple[dict[str, Any] | None, str]:
             [
                 "gh", "api",
                 f"repos/{repo}/commits/{sha}/pulls",
+                "--method", "GET",
                 "-f", "per_page=100",
             ],
             capture_output=True,

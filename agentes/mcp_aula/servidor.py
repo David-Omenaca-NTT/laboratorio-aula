@@ -184,7 +184,7 @@ def resultado_tests(args: dict) -> dict:
                 return {
                     "run_id": str(run_id),
                     "status": "error",
-                    "error": logs.stderr.strip() or "no se pudieron obtener los logs",
+                    "error": logs.stderr.strip() or "No se pudieron recuperar los logs del run",
                 }
             payload["logs"] = logs.stdout.strip() if logs.stdout else ""
             payload["run_id"] = str(run_id)
