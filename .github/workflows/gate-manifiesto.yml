@@ -33,7 +33,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          git fetch origin "${BASE_REF}" --depth=1
           cambios="$(git diff --name-only "origin/${BASE_REF}...${HEAD_SHA}")"
           fallo=0
 
