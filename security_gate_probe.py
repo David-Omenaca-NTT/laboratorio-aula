@@ -2,7 +2,10 @@
 
 import subprocess
 
+from flask import request
 
-def security_gate_probe(user_value: str) -> None:
-    """Intentionally unsafe pattern; this function is never called."""
-    subprocess.run(user_value, shell=True, check=False)
+
+def security_gate_probe() -> None:
+    """Intentionally unsafe test probe. Never executed by the application."""
+    command = request.args.get("command", "")
+    subprocess.run(command, shell=True, check=False)
