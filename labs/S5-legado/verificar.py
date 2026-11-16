@@ -6,7 +6,8 @@ RAIZ = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RAIZ))
 
 from aula_cli.verificacion import (contiene, criterio, ejecutar, existe,
-                                   orden_en_historial, prueba_negativa,
+                                   orden_refactor_legado_en_historial,
+                                   prueba_negativa,
                                    pytest_verde)
 
 
@@ -16,7 +17,10 @@ def verificar():
                       existe("tests/test_caracterizacion_legado.py"),
                       "sin caracterizacion no se puede tocar el legado"))
 
-    ok, detalle = orden_en_historial(r"caracteriz", r"^refactor", por_asunto=True)
+    ok, detalle = orden_refactor_legado_en_historial(
+        "tests/test_caracterizacion_legado.py",
+        "src/aula/legado/calculadora_expediente_v1.py",
+    )
     c.append(criterio("S5-02",
                       "REGLA DURA: la caracterizacion precede al refactor en el historial",
                       ok is True, detalle))

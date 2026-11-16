@@ -151,3 +151,69 @@ def orden_en_historial(patron_antes, patron_despues, por_asunto=False):
             primer_antes, primer_despues)
     return False, ("el refactor (commit %d) precede a la caracterizacion (commit %d)"
                    % (primer_despues, primer_antes))
+
+
+def orden_refactor_legado_en_historial(ruta_caracterizacion, ruta_legado):
+    """Comprueba el orden de caracterización y modificación del legado S5.
+
+    La introducción inicial del módulo legado no cuenta como refactor. La
+    primera modificación posterior a esa introducción sí debe ocurrir después
+    del commit que añade la batería de caracterización.
+    """
+    p = ejecutar(["git", "log", "--reverse", "--format=%H|%s", "--name-status"])
+    if p.returncode != 0:
+        return None, "sin historial de git disponible"
+
+    commits = []
+    actual = None
+    for linea in p.stdout.splitlines():
+        if "|" in linea and len(linea.split("|", 1)[0]) == 40:
+            actual = {
+                "orden": len(commits) + 1,
+                "rutas": [],
+            }
+            commits.append(actual)
+            continue
+        if actual is None or not linea.strip():
+            continue
+        partes = linea.split("\t", 1)
+        if len(partes) == 2:
+            estado, ruta = partes
+        else:
+            estado, ruta = "", linea.strip()
+        actual["rutas"].append((estado, ruta))
+
+    caracterizacion = next(
+        (
+            commit["orden"]
+            for commit in commits
+            if any(ruta == ruta_caracterizacion for _, ruta in commit["rutas"])
+        ),
+        None,
+    )
+    modificaciones_legado = [
+        commit["orden"]
+        for commit in commits
+        if any(
+            ruta == ruta_legado and estado[:1] in {"M", "R", "C"}
+            for estado, ruta in commit["rutas"]
+        )
+    ]
+
+    if caracterizacion is None:
+        return False, "no hay ningun commit que anada caracterizacion"
+    if modificaciones_legado and modificaciones_legado[0] < caracterizacion:
+        return False, (
+            "el legado se modifico antes de la caracterizacion "
+            "(commit %d frente a %d)"
+            % (modificaciones_legado[0], caracterizacion)
+        )
+    posteriores = [
+        orden for orden in modificaciones_legado if orden > caracterizacion
+    ]
+    if not posteriores:
+        return True, "todavia no hay commits de refactor del legado"
+    return True, (
+        "caracterizacion en el commit %d, refactor del legado a partir del %d"
+        % (caracterizacion, posteriores[0])
+    )
