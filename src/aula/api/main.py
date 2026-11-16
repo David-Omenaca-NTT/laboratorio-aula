@@ -2,17 +2,22 @@
 from __future__ import annotations
 
 import os
+import logging
+from time import perf_counter
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from starlette.responses import PlainTextResponse
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
 
 from ..dominio.modelos import EstadoMatricula, Expediente, SolicitudMatricula
 from ..reglas.motor import (VentanaCerrada, VentanaMatricula,
                             evaluar_solicitud)
 from ..reglas.planes import cargar_plan
+from ..observabilidad import registrar_evento, traza_tecnica
 
 
 @asynccontextmanager
@@ -23,6 +28,48 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Aula Students", version="0.0.0", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def registrar_peticion(request: Request, call_next):
+    correlation_id = str(uuid4())
+    request.state.correlation_id = correlation_id
+    inicio = perf_counter()
+    status_http = 500
+    headers = {"X-Correlation-ID": correlation_id}
+
+    try:
+        response = await call_next(request)
+        status_http = response.status_code
+        response.headers["X-Correlation-ID"] = correlation_id
+    except Exception as error:
+        registrar_evento(
+            "http.unhandled_error",
+            version=app.version,
+            correlation_id=correlation_id,
+            nivel=logging.ERROR,
+            route=getattr(request.scope.get("route"), "path", "unmatched"),
+            exception_type=type(error).__name__,
+            traceback=traza_tecnica(error),
+        )
+        response = PlainTextResponse(
+            "Internal Server Error",
+            status_code=500,
+            headers=headers,
+        )
+    finally:
+        ruta = getattr(request.scope.get("route"), "path", "unmatched")
+        registrar_evento(
+            "http.access",
+            version=app.version,
+            correlation_id=correlation_id,
+            method=request.method,
+            route=ruta,
+            status=status_http,
+            duration_ms=round((perf_counter() - inicio) * 1000, 3),
+        )
+
+    return response
 
 
 class SolicitudEntrada(BaseModel):
@@ -109,7 +156,7 @@ def salud():
 @app.post(
     "/matriculas", response_model=MatriculaRespuesta, status_code=201,
 )
-def crear_matricula(entrada: SolicitudEntrada):
+def crear_matricula(entrada: SolicitudEntrada, request: Request):
     plan = cargar_plan("PLAN-2024")
     desconocidos = [codigo for codigo in entrada.codigos
                     if codigo not in plan.asignaturas]
@@ -139,6 +186,16 @@ def crear_matricula(entrada: SolicitudEntrada):
         raise HTTPException(status_code=422, detail=str(error)) from error
 
     app.state.matriculas.append(matricula)
+    registrar_evento(
+        "matricula.created",
+        version=app.version,
+        correlation_id=request.state.correlation_id,
+        resultado=matricula.estado.value,
+        plan=matricula.plan_aplicado,
+        version_plan=matricula.version_plan_aplicada,
+        numero_asignaturas=len(matricula.lineas),
+        creditos_admitidos=matricula.creditos_admitidos,
+    )
     return matricula
 
 

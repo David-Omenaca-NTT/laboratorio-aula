@@ -1,12 +1,17 @@
 
+import json
+import logging
 from datetime import datetime
+from datetime import timezone
 
 import pytest
 from fastapi.testclient import TestClient
 from src.aula import auditoria
+from src.aula.api import main as api
 from src.aula.api.main import app
 
 client = TestClient(app)
+LOGGER_NAME = "aula.observabilidad"
 
 
 @pytest.fixture(autouse=True)
@@ -24,6 +29,23 @@ def matricula_valida():
         "curso_academico": "2026-2027",
         "codigos": ["MAT101"]
     }
+
+
+@pytest.fixture
+def eventos_log():
+    eventos = []
+
+    class Capturador(logging.Handler):
+        def emit(self, registro):
+            eventos.append(json.loads(registro.getMessage()))
+
+    logger = logging.getLogger(LOGGER_NAME)
+    capturador = Capturador()
+    logger.addHandler(capturador)
+    try:
+        yield eventos
+    finally:
+        logger.removeHandler(capturador)
 
 
 # GET /salud
@@ -209,3 +231,143 @@ def test_expediente_devuelve_mensaje_pendiente():
 def test_ruta_inexistente_devuelve_404():
     response = client.get("/ruta-inexistente")
     assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    ("metodo", "ruta", "cuerpo", "status"),
+    [
+        ("get", "/salud", None, 200),
+        ("post", "/matriculas", matricula_valida(), 201),
+        ("get", "/ruta-inexistente", None, 404),
+        ("post", "/matriculas", {**matricula_valida(), "codigos": ["NO-EXISTE"]}, 422),
+        ("get", "/expedientes/EST001", None, 501),
+    ],
+)
+def test_log_de_acceso_registra_metodo_ruta_y_status(
+    eventos_log, metodo, ruta, cuerpo, status
+):
+    if cuerpo is None:
+        respuesta = getattr(client, metodo)(ruta)
+    else:
+        respuesta = getattr(client, metodo)(ruta, json=cuerpo)
+
+    assert respuesta.status_code == status
+    accesos = [evento for evento in eventos_log if evento["event"] == "http.access"]
+    assert len(accesos) == 1
+    assert accesos[0]["method"] == metodo.upper()
+    assert accesos[0]["status"] == status
+    assert accesos[0]["route"] == (
+        "/expedientes/{estudiante_id}"
+        if ruta.startswith("/expedientes/")
+        else "unmatched"
+        if status == 404
+        else ruta
+    )
+    assert respuesta.headers["X-Correlation-ID"] == accesos[0]["correlation_id"]
+
+
+def test_log_de_acceso_registra_503(eventos_log, monkeypatch):
+    monkeypatch.delenv("MATRICULA_INICIO")
+
+    respuesta = client.post("/matriculas", json=matricula_valida())
+
+    assert respuesta.status_code == 503
+    acceso = next(
+        evento for evento in eventos_log if evento["event"] == "http.access"
+    )
+    assert acceso["status"] == 503
+    assert respuesta.headers["X-Correlation-ID"] == acceso["correlation_id"]
+
+
+def test_matricula_exitosa_emite_un_evento_seguro_y_correlacionado(eventos_log):
+
+    respuesta = client.post("/matriculas", json=matricula_valida())
+
+    eventos = eventos_log
+    creadas = [evento for evento in eventos if evento["event"] == "matricula.created"]
+    acceso = next(evento for evento in eventos if evento["event"] == "http.access")
+    assert respuesta.status_code == 201
+    assert len(creadas) == 1
+    assert creadas[0]["resultado"] == "validada"
+    assert creadas[0]["plan"] == "PLAN-2024"
+    assert creadas[0]["version_plan"] == "1.2.0"
+    assert creadas[0]["numero_asignaturas"] == 1
+    assert creadas[0]["creditos_admitidos"] == 6
+    assert creadas[0]["correlation_id"] == acceso["correlation_id"]
+    assert respuesta.headers["X-Correlation-ID"] == acceso["correlation_id"]
+    logs = json.dumps(eventos)
+    assert "EST001" not in logs
+    assert "MAT101" not in logs
+    assert "2026-2027" not in logs
+
+
+def test_solicitud_rechazada_no_emite_evento_de_creacion(eventos_log):
+
+    respuesta = client.post(
+        "/matriculas",
+        json={**matricula_valida(), "codigos": ["NO-EXISTE"]},
+    )
+
+    assert respuesta.status_code == 422
+    assert not any(
+        evento["event"] == "matricula.created" for evento in eventos_log
+    )
+
+
+def test_excepcion_inesperada_se_registra_sin_mensaje_sensible(
+    eventos_log, monkeypatch
+):
+    secreto = "MENSAJE-SENSIBLE-DE-PRUEBA"
+
+    def fallar_carga_plan(_codigo):
+        raise RuntimeError(secreto)
+
+    monkeypatch.setattr(api, "cargar_plan", fallar_carga_plan)
+    respuesta = client.post("/matriculas", json=matricula_valida())
+
+    eventos = eventos_log
+    errores = [evento for evento in eventos if evento["event"] == "http.unhandled_error"]
+    acceso = next(evento for evento in eventos if evento["event"] == "http.access")
+    assert respuesta.status_code == 500
+    assert respuesta.text == "Internal Server Error"
+    assert respuesta.headers["X-Correlation-ID"] == acceso["correlation_id"]
+    assert len(errores) == 1
+    assert errores[0]["exception_type"] == "RuntimeError"
+    assert errores[0]["traceback"]
+    assert errores[0]["correlation_id"] == acceso["correlation_id"]
+    logs = json.dumps(eventos)
+    assert secreto not in logs
+    assert "EST001" not in logs
+    assert "MAT101" not in logs
+
+
+def test_timestamps_de_logs_son_utc(eventos_log):
+
+    client.get("/salud")
+
+    evento = next(
+        evento for evento in eventos_log if evento["event"] == "http.access"
+    )
+    timestamp = datetime.fromisoformat(evento["timestamp"].replace("Z", "+00:00"))
+    assert timestamp.tzinfo == timezone.utc
+    assert evento["timestamp"].endswith("Z")
+
+
+@pytest.mark.parametrize(
+    ("version_entorno", "esperada"),
+    [("release-test-123", "release-test-123"), (None, app.version)],
+)
+def test_logs_identifican_version_de_entorno_o_fallback(
+    eventos_log, monkeypatch, version_entorno, esperada
+):
+    if version_entorno is None:
+        monkeypatch.delenv("AULA_VERSION", raising=False)
+    else:
+        monkeypatch.setenv("AULA_VERSION", version_entorno)
+
+    client.get("/salud")
+
+    evento = next(
+        evento for evento in eventos_log if evento["event"] == "http.access"
+    )
+    assert evento["version"] == esperada

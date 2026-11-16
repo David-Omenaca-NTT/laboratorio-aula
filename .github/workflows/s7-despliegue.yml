@@ -1,0 +1,149 @@
+
+name: S7 despliegue efimero
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  despliegue-efimero:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      IMAGE: aula:s7-${{ github.sha }}
+      CONTAINER: aula-s7-${{ github.run_id }}
+      VERSION: ${{ github.sha }}
+      URL: http://127.0.0.1:18000
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Preparar evidencias
+        run: |
+          mkdir -p "$RUNNER_TEMP/s7-evidence"
+          {
+            echo "sha=$VERSION"
+            echo "image=$IMAGE"
+            echo "run_id=${{ github.run_id }}"
+            echo "run_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } > "$RUNNER_TEMP/s7-evidence/metadata.txt"
+
+      - name: Instalar dependencias y generar corpus
+        run: |
+          python -m pip install -r requirements.txt
+          python herramientas/generar_corpus.py
+
+      - name: Tests y cobertura
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/ -q \
+            --cov=src/aula/dominio \
+            --cov-report=term-missing \
+            --cov-fail-under=61 \
+            2>&1 | tee "$RUNNER_TEMP/s7-evidence/tests.log"
+
+      - name: Construir imagen con Dockerfile existente
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build \
+            --label "org.opencontainers.image.revision=$VERSION" \
+            -t "$IMAGE" . \
+            2>&1 | tee "$RUNNER_TEMP/s7-evidence/build.log"
+
+          docker image inspect --format '{{.Id}}' "$IMAGE" \
+            > "$RUNNER_TEMP/s7-evidence/image-id.txt"
+
+      - name: Arrancar servicio
+        run: |
+          docker run -d \
+            --name "$CONTAINER" \
+            -p 127.0.0.1:18000:8000 \
+            -e "AULA_VERSION=$VERSION" \
+            -e MATRICULA_INICIO=2000-01-01T00:00:00Z \
+            -e MATRICULA_FIN=2100-01-01T00:00:00Z \
+            "$IMAGE"
+
+      - name: Esperar servicio
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 2 \
+              "$URL/salud" \
+              -o "$RUNNER_TEMP/s7-evidence/health.json"; then
+              python -c '
+          import json, os
+          from pathlib import Path
+          path = Path(os.environ["RUNNER_TEMP"]) / "s7-evidence/health.json"
+          assert json.loads(path.read_text())["estado"] == "ok"
+          '
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Healthcheck HTTP fallido" >&2
+          exit 1
+
+      - name: Crear matrícula sintética
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl -sS --max-time 5 \
+            -o "$RUNNER_TEMP/s7-evidence/matricula.json" \
+            -w '%{http_code}' \
+            -X POST "$URL/matriculas" \
+            -H "Content-Type: application/json" \
+            -d '{"estudiante_id":"S7-CI","curso_academico":"2099-2100","codigos":["MAT101"]}')
+
+          echo "$status" > "$RUNNER_TEMP/s7-evidence/http-status.txt"
+          test "$status" = "201"
+
+      - name: Capturar logs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/s7-evidence"
+          if docker container inspect "$CONTAINER" >/dev/null 2>&1; then
+            docker logs "$CONTAINER" \
+              > "$RUNNER_TEMP/s7-evidence/service.log" 2>&1 \
+              || echo "No se pudieron recuperar todos los logs"
+            docker inspect "$CONTAINER" \
+              > "$RUNNER_TEMP/s7-evidence/container-inspect.json" \
+              || true
+          else
+            echo "Contenedor no disponible" \
+              > "$RUNNER_TEMP/s7-evidence/service.log"
+          fi
+
+      - name: Validar despliegue y observabilidad
+        run: |
+          python herramientas/validar_despliegue_s7.py \
+            --evidence "$RUNNER_TEMP/s7-evidence" \
+            --version "$VERSION"
+
+      - name: Publicar evidencias
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s7-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/s7-evidence/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Limpiar recursos
+        if: always()
+        shell: bash
+        run: |
+          docker rm -f "$CONTAINER" 2>/dev/null || true
+          docker image rm "$IMAGE" 2>/dev/null || true
