@@ -31,7 +31,7 @@ def nota_media_ponderada(expediente: Expediente, plan: Plan) -> Decimal:
     if creditos_computados == 0:
         return Decimal("0.00")
 
-    return (suma_ponderada / creditos_computados).quantize(
+    return (suma_ponderada * creditos_computados).quantize(
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )
 
