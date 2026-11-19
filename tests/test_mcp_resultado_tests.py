@@ -71,21 +71,34 @@ def test_interpretar_junit_con_error_y_omitido():
     assert resultado["fallos"][0]["categoria"] == "error"
 
 def test_descargar_junit_sin_artifact():
-    """La ausencia del artifact no debe provocar una excepción."""
+    """Una descarga fallida devuelve diagnóstico sin exponer stderr."""
 
     respuesta_gh = subprocess.CompletedProcess(
         args=["gh", "run", "download"],
         returncode=1,
         stdout="",
-        stderr="artifact not found",
+        stderr="Error de descarga: TOKEN_SECRETO_SIMULADO",
     )
 
     with patch(
         "agentes.mcp_aula.servidor.subprocess.run",
         return_value=respuesta_gh,
-    ):
+    ) as ejecutar:
         resultado = _descargar_junit("44099682194")
 
     assert resultado["disponible"] is False
+    assert resultado["codigo_salida"] == 1
+    assert resultado["tipo_error"] == "descarga_fallida"
     assert "motivo" in resultado
     assert "xml" not in resultado
+
+    # El error original no debe aparecer en el resultado.
+    assert "TOKEN_SECRETO_SIMULADO" not in str(resultado)
+
+    # La descarga debe identificar explícitamente el repositorio.
+    comando = ejecutar.call_args.args[0]
+
+    assert "--repo" in comando
+    assert comando[comando.index("--repo") + 1] == (
+        "David-Omenaca-NTT/laboratorio-aula"
+    )

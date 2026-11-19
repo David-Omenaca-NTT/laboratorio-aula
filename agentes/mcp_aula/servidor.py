@@ -168,6 +168,7 @@ def _descargar_junit(run_id: str) -> dict:
         with tempfile.TemporaryDirectory() as directorio:
             comando = [
                 "gh", "run", "download", identificador,
+                "--repo", "David-Omenaca-NTT/laboratorio-aula",
                 "--name", "pytest-results",
                 "--dir", directorio,
             ]
@@ -184,8 +185,13 @@ def _descargar_junit(run_id: str) -> dict:
                 return {
                     "disponible": False,
                     "motivo": "No se pudo recuperar el artifact pytest-results",
+                    "codigo_salida": proceso.returncode,
+                    "tipo_error": (
+                        "autenticacion"
+                        if proceso.returncode in (4, 77)
+                        else "descarga_fallida"
+                    ),
                 }
-
             ruta_xml = Path(directorio) / "pytest-results.xml"
 
             if not ruta_xml.is_file():
