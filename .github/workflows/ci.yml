@@ -81,6 +81,16 @@ jobs:
           --cov=src/aula/dominio
           --cov-report=term-missing
           --cov-fail-under=61
+          --junitxml=pytest-results.xml
+
+      - name: Publicar evidencias de pytest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: ${{ env.PROJECT_DIR }}/pytest-results.xml
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Preparar descripción de la PR
         if: contains(github.event.pull_request.labels.*.name, 'revisar-conformidad')

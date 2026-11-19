@@ -18,6 +18,8 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[2]
@@ -152,6 +154,122 @@ def trazabilidad(args: dict) -> dict:
         "cobertura_pct": round(100.0 * (total - len(huerfanos)) / total, 1) if total else 0.0,
     }
 
+def _descargar_junit(run_id: str) -> dict:
+    """Recupera el XML de pytest publicado en un run de GitHub Actions."""
+    identificador = str(run_id)
+
+    if not identificador.isdecimal() or int(identificador) <= 0:
+        return {
+            "disponible": False,
+            "motivo": "run_id no valido",
+        }
+
+    try:
+        with tempfile.TemporaryDirectory() as directorio:
+            comando = [
+                "gh", "run", "download", identificador,
+                "--name", "pytest-results",
+                "--dir", directorio,
+            ]
+
+            proceso = subprocess.run(
+                comando,
+                capture_output=True,
+                text=True,
+                timeout=60,
+                check=False,
+            )
+
+            if proceso.returncode != 0:
+                return {
+                    "disponible": False,
+                    "motivo": "No se pudo recuperar el artifact pytest-results",
+                }
+
+            ruta_xml = Path(directorio) / "pytest-results.xml"
+
+            if not ruta_xml.is_file():
+                return {
+                    "disponible": False,
+                    "motivo": "El artifact no contiene pytest-results.xml",
+                }
+
+            if ruta_xml.stat().st_size > 5_000_000:
+                return {
+                    "disponible": False,
+                    "motivo": "El XML supera el limite de 5 MB",
+                }
+
+            return {
+                "disponible": True,
+                "xml": ruta_xml.read_text(encoding="utf-8"),
+            }
+
+    except (OSError, subprocess.TimeoutExpired, UnicodeError):
+        return {
+            "disponible": False,
+            "motivo": "Error al recuperar o leer las evidencias",
+        }
+
+def _interpretar_junit(xml: str) -> dict:
+    """Convierte un informe JUnit XML en evidencias estructuradas."""
+
+    raiz = ET.fromstring(xml)
+
+    suites = (
+        [raiz] if raiz.tag == "testsuite"
+        else raiz.findall(".//testsuite")
+    )
+
+    if not suites:
+        raise ValueError("El XML no contiene suites de pytest")
+
+    casos = []
+    fallos = []
+
+    for suite in suites:
+        for caso in suite.findall("testcase"):
+            nombre = caso.get("name", "")
+            clase = caso.get("classname", "")
+            archivo = caso.get("file", "")
+
+            casos.append(caso)
+
+            for etiqueta in ("failure", "error"):
+                for fallo in caso.findall(etiqueta):
+                    fallos.append({
+                        "test": nombre,
+                        "clase": clase,
+                        "archivo": archivo,
+                        "tipo": fallo.get("type", ""),
+                        "mensaje": fallo.get("message", ""),
+                        "detalle": (fallo.text or "").strip()[:4000],
+                        "categoria": etiqueta,
+                    })
+
+    total = len(casos)
+    failed = sum(
+        1 for caso in casos
+        if caso.find("failure") is not None
+    )
+    errors = sum(
+        1 for caso in casos
+        if caso.find("error") is not None
+    )
+    skipped = sum(
+        1 for caso in casos
+        if caso.find("skipped") is not None
+    )
+
+    return {
+        "disponible": True,
+        "total": total,
+        "passed": total - failed - errors - skipped,
+        "failed": failed,
+        "errors": errors,
+        "skipped": skipped,
+        "fallos": fallos,
+    }
 
 def resultado_tests(args: dict) -> dict:
     run_id = args.get("run_id")
@@ -181,14 +299,31 @@ def resultado_tests(args: dict) -> dict:
                 check=False,
             )
             if logs.returncode != 0:
-                return {
-                    "run_id": str(run_id),
-                    "status": "error",
-                    "error": logs.stderr.strip() or "No se pudieron recuperar los logs del run",
-                }
-            payload["logs"] = logs.stdout.strip() if logs.stdout else ""
+                payload["logs_error"] = (
+                    logs.stderr.strip()
+                    or "No se pudieron recuperar los logs del run"
+                )
+                payload["logs"] = ""
+            else:
+                payload["logs"] = logs.stdout.strip() if logs.stdout else ""
+
             payload["run_id"] = str(run_id)
             payload["evidencia"] = payload.get("logs", "")
+
+            # Recuperar las evidencias estructuradas de pytest.
+            artifact = _descargar_junit(str(run_id))
+
+            if artifact["disponible"]:
+                try:
+                    payload["pytest"] = _interpretar_junit(artifact["xml"])
+                except (ValueError, ET.ParseError) as exc:
+                    payload["pytest"] = {
+                        "disponible": False,
+                        "motivo": f"No se pudo interpretar el XML: {exc}",
+                    }
+            else:
+                payload["pytest"] = artifact
+
             return payload
         except Exception as exc:
             return {"run_id": str(run_id), "status": "error", "error": str(exc)}
