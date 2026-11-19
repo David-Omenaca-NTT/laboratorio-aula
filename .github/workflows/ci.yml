@@ -118,13 +118,9 @@ jobs:
             --base "origin/$BASE_REF" \
             --cuerpo "$RUNNER_TEMP/pr-body.md"
 
-  build-imagen:
-    name: Construir y probar imagen
+  despliegue-efimero:
+    name: Desplegar y comprobar servicio efimero
     needs: tests
     permissions:
       contents: read
-      packages: write
-      id-token: write
-    uses: ./.github/workflows/imagen.yml
-    secrets:
-      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: ./.github/workflows/s7-despliegue.yml
