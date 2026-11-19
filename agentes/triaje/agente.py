@@ -132,6 +132,32 @@ def _resumen_contexto(contexto: dict[str, Any]) -> str:
             piezas.append(_coerce_text(valor))
     return "\n".join(piezas).lower()
 
+def _clasificacion_por_junit(
+    contexto: dict[str, Any],
+) -> str | None:
+    """Prioriza los fallos estructurados de pytest sobre los logs."""
+
+    resultado = contexto.get("resultado_tests")
+    if not isinstance(resultado, dict):
+        return None
+
+    pytest = resultado.get("pytest")
+    if not isinstance(pytest, dict):
+        return None
+
+    if pytest.get("disponible") is not True:
+        return None
+
+    try:
+        failed = int(pytest.get("failed", 0))
+        errors = int(pytest.get("errors", 0))
+    except (TypeError, ValueError):
+        return None
+
+    if failed > 0 or errors > 0:
+        return "tests"
+
+    return None
 
 def _clasificacion_por_evidencia(texto: str, spec_id: str | None) -> tuple[str, str | None]:
     texto_normal = texto.lower()
@@ -236,9 +262,16 @@ def clasificar_fallo(run_id: str | dict | None, contexto: Any = None, **kwargs: 
         if isinstance(spec, str) and re.fullmatch(r"SPEC-\d+", spec.strip(), flags=re.IGNORECASE):
             spec_id = spec.upper()
 
-    categoria, spec_id_confirmada = _clasificacion_por_evidencia(texto, spec_id)
-    if spec_id_confirmada is not None:
-        spec_id = spec_id_confirmada
+    categoria_junit = _clasificacion_por_junit(contexto)
+
+    if categoria_junit is not None:
+        categoria = categoria_junit
+    else:
+        categoria, spec_id_confirmada = _clasificacion_por_evidencia(
+            texto, spec_id
+        )
+        if spec_id_confirmada is not None:
+            spec_id = spec_id_confirmada
 
     if categoria == "cobertura_spec" and spec_id is None:
         categoria = "desconocido"
